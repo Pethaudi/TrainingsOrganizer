@@ -1,0 +1,13 @@
+FROM postgres:18.3
+
+ARG DB_USER=myuser
+ARG DB_PASSWORD=mypassword
+ARG DB_NAME=TrainingsOrganizer
+
+ENV POSTGRES_USER=$DB_USER
+ENV POSTGRES_PASSWORD=$DB_PASSWORD
+ENV POSTGRES_DB=$DB_NAME
+
+COPY init.sql /docker-entrypoint-initdb.d/init.sql
+
+EXPOSE 5432

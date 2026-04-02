@@ -1,9 +1,9 @@
-DROP TABLE CourseTrainers;
-DROP TABLE CourseRegisters;
-DROP TABLE Courses;
-DROP TABLE DogTeams;
-DROP TABLE Dogs;
-DROP TABLE Registered;
+DROP TABLE IF EXISTS CourseTrainers;
+DROP TABLE IF EXISTS CourseRegisters;
+DROP TABLE IF EXISTS Courses;
+DROP TABLE IF EXISTS DogTeams;
+DROP TABLE IF EXISTS Dogs;
+DROP TABLE IF EXISTS Registered;
 
 
 
