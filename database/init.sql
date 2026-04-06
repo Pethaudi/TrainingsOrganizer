@@ -4,6 +4,7 @@ DROP TABLE IF EXISTS Courses;
 DROP TABLE IF EXISTS DogTeams;
 DROP TABLE IF EXISTS Dogs;
 DROP TABLE IF EXISTS Registered;
+DROP TABLE IF EXISTS CourseAppointments;
 
 
 
@@ -40,6 +41,13 @@ CREATE TABLE CourseTrainers (
   courseId INTEGER NOT NULL REFERENCES Courses(id),
   trainerId INTEGER NOT NULL REFERENCES Registered(id),
   PRIMARY KEY (courseId, trainerId)
+);
+
+CREATE TABLE Appointments (
+  id SERIAL PRIMARY KEY,
+  relationId INTEGER REFERENCES Courses(id),
+  date DATE,
+  note VARCHAR
 );
 
 INSERT INTO Registered (name) VALUES ('Horst');
@@ -91,3 +99,19 @@ INSERT INTO CourseTrainers (courseId, trainerId)
   SELECT
     (SELECT id FROM Courses WHERE name = 'Grundkurs'),
     (SELECT id FROM Registered WHERE name = 'Brigitte');
+
+INSERT INTO Appointments (relationId, date, note)
+  SELECT
+    (SELECT id FROM Courses WHERE name = 'Social Walk'),
+    '2026-04-12',
+    'Treffpunkt Parkplatz Westeingang';
+INSERT INTO Appointments (relationId, date, note)
+  SELECT
+    (SELECT id FROM Courses WHERE name = 'Grundkurs'),
+    '2026-04-15',
+    'Bitte Leckerlis mitbringen';
+INSERT INTO Appointments (relationId, date, note)
+  SELECT
+    (SELECT id FROM Courses WHERE name = 'Grundkurs'),
+    '2026-04-22',
+    'Zweite Einheit - Leinenführigkeit';
