@@ -38,9 +38,10 @@ CREATE TABLE CourseRegisters (
 );
 
 CREATE TABLE CourseTrainers (
+  id SERIAL PRIMARY KEY,
   courseId INTEGER NOT NULL REFERENCES Courses(id),
   trainerId INTEGER NOT NULL REFERENCES Registered(id),
-  PRIMARY KEY (courseId, trainerId)
+  UNIQUE (courseId, trainerId)
 );
 
 CREATE TABLE Appointments (
@@ -94,6 +95,10 @@ INSERT INTO CourseRegisters (courseId, handlerId, dogId)
 INSERT INTO CourseTrainers (courseId, trainerId)
   SELECT
     (SELECT id FROM Courses WHERE name = 'Social Walk'),
+    (SELECT id FROM Registered WHERE name = 'Peter');
+INSERT INTO CourseTrainers (courseId, trainerId)
+  SELECT
+    (SELECT id FROM Courses WHERE name = 'Grundkurs'),
     (SELECT id FROM Registered WHERE name = 'Peter');
 INSERT INTO CourseTrainers (courseId, trainerId)
   SELECT
