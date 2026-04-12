@@ -2,7 +2,7 @@
   <h1 class="text-4xl text-cyan-900 dark:text-cyan-100 mb-8">Your courses</h1>
   <div class="flex gap-4 mb-4 flex-wrap">
     @for (course of coursesAsTrainer(); track course.id) {
-      <mat-card appearance="filled" class="w-sm shrink-0">
+      <mat-card appearance="filled" class="w-sm shrink-0" [routerLink]="['/courses', course.id]">
         <mat-card-header class="mb-2 border-b border-cyan-600 dark:border-cyan-200">
           <mat-card-title class="pb-2 text-cyan-600 dark:text-cyan-200">{{ course.name }}</mat-card-title>
         </mat-card-header>

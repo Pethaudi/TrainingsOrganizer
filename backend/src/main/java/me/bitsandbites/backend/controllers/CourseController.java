@@ -6,9 +6,11 @@ import me.bitsandbites.backend.dtos.CourseDetailsDTO;
 import me.bitsandbites.backend.dtos.CourseMinimumDTO;
 import me.bitsandbites.backend.dtos.Role;
 import me.bitsandbites.backend.dtos.UserDTO;
+import me.bitsandbites.backend.entities.Appointment;
 import me.bitsandbites.backend.entities.Course;
 import me.bitsandbites.backend.entities.CourseTrainer;
 import me.bitsandbites.backend.helpers.TokenParser;
+import me.bitsandbites.backend.repositories.AppointmentRepository;
 import me.bitsandbites.backend.repositories.CourseRepository;
 import me.bitsandbites.backend.repositories.CourseTrainerRepository;
 import me.bitsandbites.backend.repositories.RegisteredRepository;
@@ -25,16 +27,19 @@ public class CourseController {
     private final CourseTrainerRepository courseTrainerRepository;
     private final CourseRepository courseRepository;
     private final RegisteredRepository registeredRepository;
+    private final AppointmentRepository appointmentRepository;
 
     @Autowired
     public CourseController(
             CourseTrainerRepository courseTrainerRepository,
             CourseRepository courseRepository,
-            RegisteredRepository registeredRepository
+            RegisteredRepository registeredRepository,
+            AppointmentRepository appointmentRepository
     ) {
         this.courseTrainerRepository = courseTrainerRepository;
         this.courseRepository = courseRepository;
         this.registeredRepository = registeredRepository;
+        this.appointmentRepository = appointmentRepository;
     }
 
     @PostMapping()
@@ -72,5 +77,10 @@ public class CourseController {
                                 .toList()
                 ))
                 .toList();
+    }
+
+    @GetMapping("/{courseId}/appointments")
+    public Iterable<Appointment> getCoursesByUser(@PathVariable Integer courseId) {
+        return this.appointmentRepository.findByCourseId(courseId);
     }
 }

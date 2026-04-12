@@ -1,0 +1,4 @@
+<p>course-details works!</p>
+@for (appointment of appointments(); track appointment.id) {
+  <p>{{ appointment.id }} - {{ appointment.note }}</p>
+}

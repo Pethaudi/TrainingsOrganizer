@@ -1,29 +1,26 @@
 import { Component, inject, OnInit, Signal, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import {MatCardModule} from '@angular/material/card';
 import CourseDetails from '../../entities/course-details.interface';
-import { CoursesServices } from '../../services/courses-services';
+import { CoursesService } from '../../services/courses-service';
 import { Store } from '@ngrx/store';
-import User from '../../entities/user.interface';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 
 import {
-  MAT_DIALOG_DATA,
   MatDialog,
 } from '@angular/material/dialog';
 import { AddCourse } from '../../components/modals/add-course/add-course';
-import UserState from '../../stores/user/user.state';
-import { user } from '../../stores/user/user.actions';
 import { selectUserId } from '../../stores/user/user.selectors';
 
 @Component({
   selector: 'app-home',
-  imports: [MatCardModule, MatButtonModule, MatIconModule],
+  imports: [RouterLink, MatCardModule, MatButtonModule, MatIconModule],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
 export class Home implements OnInit {
-  private readonly coursesService = inject(CoursesServices);
+  private readonly coursesService = inject(CoursesService);
   private readonly userId: Signal<number | null> = inject(Store).selectSignal(selectUserId);
   private readonly dialog = inject(MatDialog)
   

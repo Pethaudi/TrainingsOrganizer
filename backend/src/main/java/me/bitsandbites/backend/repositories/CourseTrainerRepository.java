@@ -5,8 +5,6 @@ import org.hibernate.service.Service;
 import org.springframework.data.repository.CrudRepository;
 
 public interface CourseTrainerRepository extends CrudRepository<CourseTrainer, Integer> {
-    Iterable<CourseTrainer> findAll();
-    Iterable<CourseTrainer> findByTrainerName(String name);
     Iterable<CourseTrainer> findByTrainerId(Integer id);
     Iterable<CourseTrainer> findByCourseId(Integer id);
 }
