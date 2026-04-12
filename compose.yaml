@@ -3,3 +3,29 @@ services:
     build: database/.
     ports:
       - 5432:5432
+    # source: https://docs.docker.com/reference/compose-file/services/#healthcheck
+    # pg_isready docs: https://www.postgresql.org/docs/current/app-pg-isready.html
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U myuser -d TrainingsOrganizer"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: backend/.
+    ports:
+      - 8080:8080
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/TrainingsOrganizer
+      SPRING_DATASOURCE_USERNAME: myuser
+      SPRING_DATASOURCE_PASSWORD: mypassword
+    depends_on:
+      database:
+        condition: service_healthy
+
+  frontend:
+    build: frontend/.
+    ports:
+      - 4200:4200
+    depends_on:
+      - backend
