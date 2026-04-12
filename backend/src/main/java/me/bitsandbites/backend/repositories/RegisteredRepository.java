@@ -15,4 +15,16 @@ public interface RegisteredRepository extends CrudRepository<Registered, Integer
             nativeQuery = true
     )
     Boolean isTrainer(String name);
+
+    @Query(
+            value = "SELECT id, name FROM registered WHERE name = ?1 AND password = crypt(?2, 'md5')",
+            nativeQuery = true
+    )
+    Optional<Registered> authenticateUser(String name, String password);
+
+    @Query(
+            value = "SELECT EXISTS (SELECT id, name FROM registered WHERE name = ?1 AND password = crypt(?2, 'md5'))",
+            nativeQuery = true
+    )
+    boolean isUserAndPasswordCorrect(String username, String password);
 }

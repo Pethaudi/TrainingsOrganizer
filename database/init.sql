@@ -6,11 +6,12 @@ DROP TABLE IF EXISTS Dogs;
 DROP TABLE IF EXISTS Registered;
 DROP TABLE IF EXISTS CourseAppointments;
 
-
+CREATE EXTENSION pgcrypto;
 
 CREATE TABLE Registered (
   id SERIAL PRIMARY KEY,
-  name VARCHAR NOT NULL
+  name TEXT NOT NULL,
+  password TEXT NOT NULL
 );
 
 CREATE TABLE Dogs (
@@ -51,10 +52,10 @@ CREATE TABLE Appointments (
   note VARCHAR
 );
 
-INSERT INTO Registered (name) VALUES ('Horst');
-INSERT INTO Registered (name) VALUES ('Peter');
-INSERT INTO Registered (name) VALUES ('Brigitte');
-INSERT INTO Registered (name) VALUES ('Meli');
+INSERT INTO Registered (name, password) VALUES ('Horst', crypt('Horst', 'md5'));
+INSERT INTO Registered (name, password) VALUES ('Peter', crypt('Peter', 'md5'));
+INSERT INTO Registered (name, password) VALUES ('Brigitte', crypt('Brigitte', 'md5'));
+INSERT INTO Registered (name, password) VALUES ('Meli', crypt('Meli', 'md5'));
 
 INSERT INTO Dogs (name) VALUES ('Günni');
 INSERT INTO Dogs (name) VALUES ('Alba');

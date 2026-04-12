@@ -1,22 +1,20 @@
 import { createReducer, on } from '@ngrx/store';
 import { user } from './user.actions';
-import User from '../../entities/user.interface';
+import UserState from './user.state';
 
-function createInitialState() {
-  if (localStorage) {
-    try {
-      return JSON.parse(localStorage.getItem('user')!);
-    } catch {
-      return null;
-    }
-  } else {
-    return null;
-  }
-}
-
-export const initialState: User | null | string = createInitialState();
+export const initialState: UserState = {
+  user: null,
+  isUserPending: true
+};
 
 export const userReducer = createReducer(
   initialState,
-  on(user.setUser, (_, { user }) => user)
+  on(user.setUser, (_, { user }) => ({
+    user,
+    isUserPending: !user
+  })),
+  on(user.setIsUserPending, (state, { isUserPending }) => ({
+    user: state.user,
+    isUserPending
+  }))
 );

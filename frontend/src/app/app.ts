@@ -3,6 +3,9 @@ import { Router, RouterOutlet } from '@angular/router';
 import { MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { Store } from '@ngrx/store';
+import UserState from './stores/user/user.state';
+import { selectIsUserPending } from './stores/user/user.selectors';
+import { SecurityService } from './services/security-service';
 
 @Component({
   selector: 'app-root',
@@ -14,16 +17,18 @@ import { Store } from '@ngrx/store';
 export class App implements OnInit {
   protected readonly isDark = signal(false);
   readonly router = inject(Router);
+  readonly securityService = inject(SecurityService);
   readonly store = inject(Store);
-  readonly user = this.store.selectSignal(state => state.user);
+  readonly user = this.store.selectSignal<UserState>(state => state.user);
+  readonly isUserPending = this.store.selectSignal(selectIsUserPending);
   private previousUser = untracked(this.user);
 
   readonly redirectToHomeIfUserIsSet = () => {
-    const prev = this.previousUser;
-    const current = this.user();
+    const prev = this.previousUser.user;
+    const current = this.user().user;
     const prevWasNullOrString = prev === null || typeof prev === 'string';
     const currentIsObject = current !== null && typeof current === 'object';
-    this.previousUser = current;
+    this.previousUser = this.user();
     if (prevWasNullOrString && currentIsObject) {
       this.router.navigate(['/home']);
     }
@@ -35,6 +40,8 @@ export class App implements OnInit {
     if (saved === 'dark') {
       this.applyTheme(true);
     }
+
+    this.securityService.authenticate();
   }
 
   toggleTheme() {

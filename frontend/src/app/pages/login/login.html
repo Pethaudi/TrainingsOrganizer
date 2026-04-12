@@ -6,9 +6,13 @@
   >
     <h1 class="text-2xl my-2">Login</h1>
     <p class="text-sm">Dein Trainings-Organizer</p>
-    <mat-form-field class="example-full-width" appearance="fill">
+    <mat-form-field appearance="fill">
       <mat-label>Username</mat-label>
-      <input matInput placeholder="Ex. Peter" formControlName="username">
+      <input matInput formControlName="username">
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+      <mat-label>Password</mat-label>
+      <input matInput type="password" formControlName="password">
     </mat-form-field>
     <button mat-flat-button color="primary" type="submit" [disabled]="!loginForm.valid">Login</button>
     

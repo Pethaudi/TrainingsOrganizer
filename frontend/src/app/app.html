@@ -1,5 +1,7 @@
 <div class="h-full w-full relative">
-  <router-outlet />
+  @if (isUserPending() === false) {
+    <router-outlet />
+  }
   <button
     mat-icon-button
     (click)="toggleTheme()"

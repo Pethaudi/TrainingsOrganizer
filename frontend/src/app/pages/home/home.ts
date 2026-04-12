@@ -12,6 +12,9 @@ import {
   MatDialog,
 } from '@angular/material/dialog';
 import { AddCourse } from '../../components/modals/add-course/add-course';
+import UserState from '../../stores/user/user.state';
+import { user } from '../../stores/user/user.actions';
+import { selectUserId } from '../../stores/user/user.selectors';
 
 @Component({
   selector: 'app-home',
@@ -21,26 +24,25 @@ import { AddCourse } from '../../components/modals/add-course/add-course';
 })
 export class Home implements OnInit {
   private readonly coursesService = inject(CoursesServices);
-  private readonly userStore: Signal<User> = inject(Store).selectSignal(store => store.user);
+  private readonly userId: Signal<number | null> = inject(Store).selectSignal(selectUserId);
   private readonly dialog = inject(MatDialog)
   
   readonly coursesAsTrainer = signal(new Array<CourseDetails>());
 
   ngOnInit() {
-    this.coursesService.coursesOfTrainer(this.userStore().id)
+    this.coursesService.coursesOfTrainer(this.userId() ?? 0)
       .subscribe({
         next: this.coursesAsTrainer.set
-      });
+    });
   }
 
   openAddCourse() {
     this.dialog.open(AddCourse).afterClosed().subscribe({
       next: (result: { name: string } | undefined) => {
         if (result) {
-          console.log('New course:', result);
           this.coursesService.createCourse({
             name: result.name,
-            trainers: [this.userStore().id]
+            trainers: [this.userId() ?? 0]
           }).subscribe({
             next: (newCourse) => {
               this.coursesAsTrainer().push(newCourse);

@@ -26,12 +26,13 @@ export class Login {
   private store = inject(Store);
   protected userError = this.store.selectSignal(selectUserError);
 
-  loginForm = this.formBuilder.group({
-    username: ['', Validators.required]
+  loginForm = this.formBuilder.nonNullable.group({
+    username: ['', Validators.required],
+    password: ['', Validators.required]
   });
 
   async onLogin() {
-    this.securityService.login(this.loginForm.value.username!);
+    this.securityService.login(this.loginForm.getRawValue());
     return false;
   }
 }
