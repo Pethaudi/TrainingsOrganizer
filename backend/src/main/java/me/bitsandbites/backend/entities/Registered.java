@@ -14,8 +14,8 @@ public class Registered {
 
     public Registered() {}
 
-    public Registered(String name) {
-        this.name = name;
+    public Registered(Integer id) {
+        this.id = id;
     }
 
     @Override

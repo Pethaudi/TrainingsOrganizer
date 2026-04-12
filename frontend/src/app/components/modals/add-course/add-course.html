@@ -1,0 +1,13 @@
+<form [formGroup]="addForm">
+  <h2 mat-dialog-title>Add Course</h2>
+  <mat-dialog-content>
+    <mat-form-field appearance="fill">
+      <mat-label>Name</mat-label>
+      <input matInput placeholder="Ex. Grundkurs Herbst 2026" formControlName="name">
+    </mat-form-field>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" (click)="abort()">Abort</button>
+    <button mat-flat-button type="button" [disabled]="!addForm.valid" (click)="save()">Save</button>
+  </mat-dialog-actions>
+</form>

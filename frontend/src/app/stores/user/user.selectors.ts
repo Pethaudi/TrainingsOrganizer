@@ -13,4 +13,10 @@ export const selectUserError = createSelector(
       return null;
     }
   }
+);
+export const selectUserLoggedIn = createSelector(
+  selectUser,
+  (state: User | null | string) => {
+    return typeof state === 'object' && state !== null;
+  }
 )

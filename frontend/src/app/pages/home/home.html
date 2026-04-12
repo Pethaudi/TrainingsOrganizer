@@ -1,1 +1,24 @@
-<p>home works!</p>
+<div class="p-8">
+  <h1 class="text-4xl text-cyan-900 dark:text-cyan-100 mb-8">Your courses</h1>
+  <div class="flex gap-4 mb-4 flex-wrap">
+    @for (course of coursesAsTrainer(); track course.id) {
+      <mat-card appearance="filled" class="w-sm shrink-0">
+        <mat-card-header class="mb-2 border-b border-cyan-600 dark:border-cyan-200">
+          <mat-card-title class="pb-2 text-cyan-600 dark:text-cyan-200">{{ course.name }}</mat-card-title>
+        </mat-card-header>
+
+          <mat-card-content>
+            <p>Next appoinment: 03.06.26 14:00</p>
+            <p>Last appoinment: 03.04.26 14:00</p>
+            
+            <p>14 Participants.</p>
+          </mat-card-content>
+      </mat-card>
+    }
+
+    <button matFab extended (click)="openAddCourse()">
+      <mat-icon>add</mat-icon>
+      Add Course
+    </button>
+  </div>
+</div>

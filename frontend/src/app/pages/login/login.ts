@@ -5,7 +5,6 @@ import { MatInput } from '@angular/material/input';
 import { MatButton } from '@angular/material/button';
 import { SecurityService } from '../../services/security-service';
 import { Store } from '@ngrx/store';
-import User from '../../entities/user.interface';
 import { selectUserError } from '../../stores/user/user.selectors';
 
 @Component({

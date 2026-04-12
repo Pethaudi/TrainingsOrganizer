@@ -1,7 +1,6 @@
 package me.bitsandbites.backend.entities;
 
 import jakarta.persistence.*;
-import jakarta.persistence.criteria.CriteriaBuilder;
 
 @Entity(name = "coursetrainers")
 @Table(name = "coursetrainers")
@@ -11,15 +10,25 @@ public class CourseTrainer {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Integer id;
 
-    @ManyToOne
-    @MapsId("trainerId")
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "trainerid", referencedColumnName = "id")
     private Registered trainer;
 
-    @ManyToOne
-    @MapsId("courseId")
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "courseid", referencedColumnName = "id")
     private Course course;
+
+    public CourseTrainer() {}
+
+    public CourseTrainer(Integer courseId, Integer trainerId) {
+        this.course = new Course(courseId);
+        this.trainer = new Registered(trainerId);
+    }
+
+    public CourseTrainer(Course course, Registered trainer) {
+        this.course = course;
+        this.trainer = trainer;
+    }
 
     public Integer getId() { return id; }
     public Registered getTrainer() { return trainer; }

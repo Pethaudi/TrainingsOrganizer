@@ -16,6 +16,10 @@ public class Course {
 
     public Course() {}
 
+    public Course(Integer id) {
+        this.id = id;
+    }
+
     public Course(String name) {
         this.name = name;
     }

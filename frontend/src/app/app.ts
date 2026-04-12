@@ -17,7 +17,8 @@ export class App implements OnInit {
   readonly store = inject(Store);
   readonly user = this.store.selectSignal(state => state.user);
   private previousUser = untracked(this.user);
-  userEffect = effect(() => {
+
+  readonly redirectToHomeIfUserIsSet = () => {
     const prev = this.previousUser;
     const current = this.user();
     const prevWasNullOrString = prev === null || typeof prev === 'string';
@@ -26,7 +27,8 @@ export class App implements OnInit {
     if (prevWasNullOrString && currentIsObject) {
       this.router.navigate(['/home']);
     }
-  });
+  };
+  redirectEffect = effect(this.redirectToHomeIfUserIsSet);
 
   ngOnInit() {
     const saved = localStorage.getItem('theme');
