@@ -10,14 +10,14 @@ export class CoursesServices {
 
   private readonly http = inject(HttpClient);
 
-  coursesOfTrainer(trainerId: number) {
-    return this.http.get<Array<CourseDetails>>(this.baseUrl + 'trainer/courses/' + trainerId);
+  fetchCoursesToTeach() {
+    return this.http.get<Array<CourseDetails>>(this.baseUrl + 'courses/as-trainer');
   }
 
   createCourse(course: {
     name: string,
     trainers: Array<number>
   }) {
-    return this.http.post<CourseDetails>(this.baseUrl + 'course', course)
+    return this.http.post<CourseDetails>(this.baseUrl + 'courses', course)
   }
 }

@@ -30,7 +30,7 @@ export class Home implements OnInit {
   readonly coursesAsTrainer = signal(new Array<CourseDetails>());
 
   ngOnInit() {
-    this.coursesService.coursesOfTrainer(this.userId() ?? 0)
+    this.coursesService.fetchCoursesToTeach()
       .subscribe({
         next: this.coursesAsTrainer.set
     });

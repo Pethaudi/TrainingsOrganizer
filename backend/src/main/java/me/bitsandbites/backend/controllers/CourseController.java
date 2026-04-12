@@ -1,11 +1,14 @@
 package me.bitsandbites.backend.controllers;
 
+import jakarta.servlet.http.HttpServletRequest;
+import me.bitsandbites.backend.annotations.RequiresAuth;
 import me.bitsandbites.backend.dtos.CourseDetailsDTO;
 import me.bitsandbites.backend.dtos.CourseMinimumDTO;
 import me.bitsandbites.backend.dtos.Role;
 import me.bitsandbites.backend.dtos.UserDTO;
 import me.bitsandbites.backend.entities.Course;
 import me.bitsandbites.backend.entities.CourseTrainer;
+import me.bitsandbites.backend.helpers.TokenParser;
 import me.bitsandbites.backend.repositories.CourseRepository;
 import me.bitsandbites.backend.repositories.CourseTrainerRepository;
 import me.bitsandbites.backend.repositories.RegisteredRepository;
@@ -17,7 +20,7 @@ import java.util.Optional;
 import java.util.stream.StreamSupport;
 
 @RestController()
-@RequestMapping("course")
+@RequestMapping("courses")
 public class CourseController {
     private final CourseTrainerRepository courseTrainerRepository;
     private final CourseRepository courseRepository;
@@ -36,6 +39,7 @@ public class CourseController {
 
     @PostMapping()
     @Transactional
+    @RequiresAuth()
     public CourseDetailsDTO createCourseDetails(@RequestBody CourseMinimumDTO courseMinimumDTO) {
         var course = courseRepository.save(new Course(courseMinimumDTO.getName()));
         var trainers = StreamSupport.stream(courseMinimumDTO.getTrainers().spliterator(), false)
@@ -53,5 +57,20 @@ public class CourseController {
             trainers.stream().map(trainer -> new UserDTO(trainer.getId(), trainer.getName(), Role.Trainer)).toList()
         );
         return result;
+    }
+
+    @GetMapping("/as-trainer")
+    @RequiresAuth(role = Role.Trainer)
+    public Iterable<CourseDetailsDTO> getCoursesOfAsTrainer(HttpServletRequest request) {
+        var user = TokenParser.parseFromRequest(request);
+        return StreamSupport.stream(courseTrainerRepository.findByTrainerId(user.getId()).spliterator(), true)
+                .map(CourseDetailsDTO::new)
+                .peek(course -> course.setTrainers(
+                        StreamSupport.stream(courseTrainerRepository.findByCourseId(course.getId()).spliterator(), false)
+                                .map(CourseTrainer::getTrainer)
+                                .map(trainer -> new UserDTO(trainer.getId(), trainer.getName(), Role.Trainer))
+                                .toList()
+                ))
+                .toList();
     }
 }
