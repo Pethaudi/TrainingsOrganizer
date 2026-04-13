@@ -6,7 +6,7 @@ import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 
 @Component({
-  selector: 'app-add-course',
+  selector: 'app-add-appointment',
   imports: [
     ReactiveFormsModule,
     MatButtonModule,
@@ -17,15 +17,16 @@ import { MatInput } from '@angular/material/input';
     MatDialogContent,
     MatDialogActions,
   ],
-  templateUrl: './add-course.html',
-  styleUrl: './add-course.css',
+  templateUrl: './add-appointment.html',
+  styleUrl: './add-appointment.css',
 })
-export class AddCourse {
+export class AddAppointment {
   private formBuilder = inject(FormBuilder);
-  private dialogRef = inject(MatDialogRef<AddCourse>);
+  private dialogRef = inject(MatDialogRef<AddAppointment>);
 
   addForm = this.formBuilder.group({
-    name: ['', Validators.required],
+    note: ['', Validators.required],
+    date: [new Date().toISOString().slice(0, 16), Validators.required]
   });
 
   abort() {

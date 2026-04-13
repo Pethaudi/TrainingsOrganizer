@@ -1,4 +1,12 @@
-<p>course-details works!</p>
 @for (appointment of appointments(); track appointment.id) {
-  <p>{{ appointment.id }} - {{ appointment.note }}</p>
+  <p>
+    {{ appointment.date }} - {{ appointment.note }}
+    <button matIconButton (click)="deleteAppointment(appointment.id)">
+      <mat-icon>delete</mat-icon>
+    </button>
+  </p>
 }
+<button matFab extended (click)="openAddAppointment()">
+  <mat-icon>add</mat-icon>
+  Add Appointment
+</button>

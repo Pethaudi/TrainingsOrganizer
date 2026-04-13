@@ -1,9 +1,10 @@
 import { HttpClient } from '@angular/common/http';
-import { inject, Injectable, Signal } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import User from '../entities/user.interface';
 import { Store } from '@ngrx/store';
 import { user } from '../stores/user/user.actions';
 import { Router } from '@angular/router';
+import { catchError, of, tap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -29,16 +30,18 @@ export class SecurityService {
   }
 
   authenticate() {
-    this.http.get<User>(this.baseUrl + 'security/authenticate')
-      .subscribe({
-        next: (value) => {
-          this.store.dispatch(user.setUser({ user: value as any as User }))
-        },
-        error: () => {
-          console.log('error');
-          this.store.dispatch(user.setIsUserPending({ isUserPending: false }))
-          this.router.navigateByUrl('/login');
-        }
-      });
+    return this.http.get<User>(this.baseUrl + 'security/authenticate')
+      .pipe(
+        tap({
+          next: (value) => {
+            this.store.dispatch(user.setUser({ user: value as any as User }));
+          },
+          error: () => {
+            this.store.dispatch(user.setIsUserPending({ isUserPending: false }));
+            this.router.navigateByUrl('/login');
+          }
+        }),
+        catchError(() => of(null))
+      );
   }
 }
