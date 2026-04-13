@@ -1,30 +1,33 @@
-import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { switchMap } from 'rxjs';
 import Appointment from '../../../entities/appointment.interface';
 import { AppointmentsService } from '../../../services/appointments-service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { AddAppointment } from '../../../components/modals/add-appointment/add-appointment';
 import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-course-details',
-  imports: [MatCardModule, MatButtonModule, MatIconModule],
+  imports: [MatButtonModule, MatIconModule, DatePipe],
   templateUrl: './course-details.html',
   styleUrl: './course-details.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CourseDetails implements OnInit {
-  appointmentsService = inject(AppointmentsService);
-  activatedRoute = inject(ActivatedRoute);
-  dialog = inject(MatDialog);
+  private readonly appointmentsService = inject(AppointmentsService);
+  private readonly activatedRoute = inject(ActivatedRoute);
+  private readonly dialog = inject(MatDialog);
   private readonly location = inject(Location);
   private readonly destroyRef = inject(DestroyRef);
-  appointments = signal(new Array<Appointment>);
-  currentCourseId = signal(0);
+
+  readonly appointments = signal(new Array<Appointment>());
+  readonly currentCourseId = signal(0);
+  readonly courseName = computed(() => this.appointments()[0]?.course?.name ?? 'Course');
 
   ngOnInit(): void {
     this.activatedRoute.params.pipe(

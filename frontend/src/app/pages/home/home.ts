@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit, Signal, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import {MatCardModule} from '@angular/material/card';
 import CourseDetails from '../../entities/course-details.interface';
 import { CoursesService } from '../../services/courses-service';
 import { Store } from '@ngrx/store';
@@ -15,7 +14,7 @@ import { selectUserId } from '../../stores/user/user.selectors';
 
 @Component({
   selector: 'app-home',
-  imports: [RouterLink, MatCardModule, MatButtonModule, MatIconModule],
+  imports: [RouterLink, MatButtonModule, MatIconModule],
   templateUrl: './home.html',
   styleUrl: './home.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
