@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, Signal, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, Signal, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import {MatCardModule} from '@angular/material/card';
 import CourseDetails from '../../entities/course-details.interface';
@@ -18,6 +18,7 @@ import { selectUserId } from '../../stores/user/user.selectors';
   imports: [RouterLink, MatCardModule, MatButtonModule, MatIconModule],
   templateUrl: './home.html',
   styleUrl: './home.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Home implements OnInit {
   private readonly coursesService = inject(CoursesService);
@@ -42,7 +43,7 @@ export class Home implements OnInit {
             trainers: [this.userId() ?? 0]
           }).subscribe({
             next: (newCourse) => {
-              this.coursesAsTrainer().push(newCourse);
+              this.coursesAsTrainer.update(courses => [...courses, newCourse]);
             }
           })
         }

@@ -18,7 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @RestController()
@@ -66,16 +68,20 @@ public class CourseController {
 
     @GetMapping("/as-trainer")
     @RequiresAuth(role = Role.Trainer)
-    public Iterable<CourseDetailsDTO> getCoursesOfAsTrainer(HttpServletRequest request) {
+    public List<CourseDetailsDTO> getCoursesOfAsTrainer(HttpServletRequest request) {
         var user = TokenParser.parseFromRequest(request);
-        return StreamSupport.stream(courseTrainerRepository.findByTrainerId(user.getId()).spliterator(), true)
-                .map(CourseDetailsDTO::new)
-                .peek(course -> course.setTrainers(
-                        StreamSupport.stream(courseTrainerRepository.findByCourseId(course.getId()).spliterator(), false)
-                                .map(CourseTrainer::getTrainer)
-                                .map(trainer -> new UserDTO(trainer.getId(), trainer.getName(), Role.Trainer))
-                                .toList()
-                ))
+        return courseTrainerRepository.findAllByCoursesOfTrainer(user.getId()).stream()
+                .collect(Collectors.groupingBy(ct -> ct.getCourse().getId()))
+                .values().stream()
+                .map(relations -> {
+                    var dto = new CourseDetailsDTO(relations.get(0));
+                    dto.setTrainers(
+                            relations.stream()
+                                    .map(ct -> new UserDTO(ct.getTrainer().getId(), ct.getTrainer().getName(), Role.Trainer))
+                                    .toList()
+                    );
+                    return dto;
+                })
                 .toList();
     }
 

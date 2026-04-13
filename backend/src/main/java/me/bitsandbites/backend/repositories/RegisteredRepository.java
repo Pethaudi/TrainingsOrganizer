@@ -1,30 +1,21 @@
 package me.bitsandbites.backend.repositories;
 
 import me.bitsandbites.backend.entities.Registered;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 
-public interface RegisteredRepository extends CrudRepository<Registered, Integer> {
+public interface RegisteredRepository extends JpaRepository<Registered, Integer> {
     Registered findByName(String name);
-    Optional<Registered> findById(Integer id);
+
+    @Query("SELECT CASE WHEN COUNT(ct) > 0 THEN true ELSE false END FROM coursetrainers ct WHERE ct.trainer.name = :name")
+    boolean isTrainer(@Param("name") String name);
 
     @Query(
-            value = "SELECT EXISTS (SELECT 1 FROM coursetrainers trainers JOIN registered registers ON trainers.trainerid = registers.id WHERE registers.name = ?1)",
-            nativeQuery = true
-    )
-    Boolean isTrainer(String name);
-
-    @Query(
-            value = "SELECT id, name FROM registered WHERE name = ?1 AND password = crypt(?2, 'md5')",
+            value = "SELECT * FROM registered WHERE name = ?1 AND password = crypt(?2, 'md5')",
             nativeQuery = true
     )
     Optional<Registered> authenticateUser(String name, String password);
-
-    @Query(
-            value = "SELECT EXISTS (SELECT id, name FROM registered WHERE name = ?1 AND password = crypt(?2, 'md5'))",
-            nativeQuery = true
-    )
-    boolean isUserAndPasswordCorrect(String username, String password);
 }

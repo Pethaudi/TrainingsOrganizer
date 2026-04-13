@@ -1,4 +1,6 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { switchMap } from 'rxjs';
 import Appointment from '../../../entities/appointment.interface';
 import { AppointmentsService } from '../../../services/appointments-service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -18,17 +20,19 @@ export class CourseDetails implements OnInit {
   appointmentsService = inject(AppointmentsService);
   activatedRoute = inject(ActivatedRoute);
   dialog = inject(MatDialog);
+  private readonly destroyRef = inject(DestroyRef);
   appointments = signal(new Array<Appointment>);
   currentCourseId = signal(0);
 
   ngOnInit(): void {
-    this.activatedRoute.params.subscribe({
-      next: (params) => {
+    this.activatedRoute.params.pipe(
+      switchMap((params) => {
         this.currentCourseId.set(+params['id']);
-        this.appointmentsService.fetchAppointments(this.currentCourseId()).subscribe({
-          next: this.appointments.set
-        });
-      }
+        return this.appointmentsService.fetchAppointments(this.currentCourseId());
+      }),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: (appointments) => this.appointments.set(appointments)
     });
   }
 
@@ -41,7 +45,6 @@ export class CourseDetails implements OnInit {
   openAddAppointment() {
     this.dialog.open(AddAppointment).afterClosed().subscribe({
       next: (result: { note: string, date: string } | undefined) => {
-        console.log(new Date(result?.date ?? '').toISOString());
         if (result) {
           this.appointmentsService.createAppointment({
             relationId: this.currentCourseId(),

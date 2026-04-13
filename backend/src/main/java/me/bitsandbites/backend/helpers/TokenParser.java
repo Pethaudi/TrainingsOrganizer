@@ -13,7 +13,7 @@ import java.util.Base64;
 import java.util.Objects;
 
 public class TokenParser {
-    public static UserDTO parseFromRequest(HttpServletRequest request) {
+    public static JSONObject parseRawToken(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
         if (cookies == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
@@ -27,7 +27,11 @@ public class TokenParser {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         }
 
-        var tokenValue = new JSONObject(new String(Base64.getDecoder().decode(tokenCookie.get().getValue())));
+        return new JSONObject(new String(Base64.getDecoder().decode(tokenCookie.get().getValue())));
+    }
+
+    public static UserDTO parseFromRequest(HttpServletRequest request) {
+        var tokenValue = parseRawToken(request);
         return new UserDTO(
                 tokenValue.getInt("id"),
                 tokenValue.getString("username"),

@@ -6,9 +6,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import me.bitsandbites.backend.dtos.Role;
 import me.bitsandbites.backend.dtos.UserDTO;
 import me.bitsandbites.backend.repositories.RegisteredRepository;
-import org.apache.catalina.User;
 import org.json.JSONObject;
-import org.json.JSONString;
 import org.json.JSONStringer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -106,10 +104,7 @@ public class SecurityController {
             var tokenValue = new JSONObject(new String(Base64.getDecoder().decode(tokenCookie.get().getValue())));
             var username = tokenValue.getString("username");
             var password = new String(Base64.getDecoder().decode(tokenValue.getString("password").getBytes()));
-            if (repo.isUserAndPasswordCorrect(
-                    username,
-                    password
-            )) {
+            if (repo.authenticateUser(username, password).isPresent()) {
                 return new UserDTO(
                         tokenValue.getInt("id"),
                         tokenValue.getString("username"),
