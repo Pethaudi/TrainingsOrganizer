@@ -1,13 +1,5 @@
-<div class="h-full w-full relative">
+<div class="h-full w-full">
   @if (isUserPending() === false) {
     <router-outlet />
   }
-  <button
-    mat-icon-button
-    (click)="toggleTheme()"
-    [attr.aria-label]="isDark() ? 'Switch to light theme' : 'Switch to dark theme'"
-    class="fixed! bottom-1 right-1"
-  >
-    <mat-icon>{{ isDark() ? 'light_mode' : 'dark_mode' }}</mat-icon>
-  </button>
 </div>

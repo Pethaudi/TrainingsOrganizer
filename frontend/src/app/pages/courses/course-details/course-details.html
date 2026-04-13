@@ -1,15 +1,15 @@
 <button mat-icon-button aria-label="Go back" (click)="goBack()">
-  <mat-icon>arrow_back</mat-icon>
+  <mat-icon fontIcon="ph-arrow-left"></mat-icon>
 </button>
 @for (appointment of appointments(); track appointment.id) {
   <p>
     {{ appointment.date }} - {{ appointment.note }}
     <button matIconButton (click)="deleteAppointment(appointment.id)">
-      <mat-icon>delete</mat-icon>
+      <mat-icon fontIcon="ph-trash"></mat-icon>
     </button>
   </p>
 }
 <button matFab extended (click)="openAddAppointment()">
-  <mat-icon>add</mat-icon>
+  <mat-icon fontIcon="ph-plus"></mat-icon>
   Add Appointment
 </button>

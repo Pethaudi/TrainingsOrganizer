@@ -1,0 +1,123 @@
+<div class="flex h-screen overflow-hidden bg-zinc-50 dark:bg-zinc-950">
+
+  <!-- Sidebar -->
+  <aside
+    [class]="isFullscreen()
+      ? 'flex flex-col w-full md:w-64 md:shrink-0 bg-white dark:bg-zinc-900 border-r border-zinc-200 dark:border-zinc-800'
+      : 'hidden md:flex flex-col w-64 shrink-0 bg-white dark:bg-zinc-900 border-r border-zinc-200 dark:border-zinc-800'"
+    aria-label="Main navigation"
+  >
+
+    <!-- Brand -->
+    <div class="px-4 py-4 border-b border-zinc-200 dark:border-zinc-800">
+      <p class="text-base font-bold tracking-tight text-violet-600 dark:text-violet-400">Bits&amp;Bites</p>
+      <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Trainings-Organizer</p>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="flex-1 overflow-y-auto px-3 py-3 flex flex-col gap-4" aria-label="Site navigation">
+
+      <!-- General -->
+      <section>
+        <p class="px-2 pb-2 text-[10px] font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-600">
+          General
+        </p>
+        <a
+          routerLink="/home"
+          routerLinkActive="bg-violet-50 dark:bg-violet-950 text-violet-700 dark:text-violet-300 font-semibold"
+          ariaCurrentWhenActive="page"
+          (click)="closeSidebar()"
+          class="flex items-center gap-3 px-2 py-2 rounded-lg text-sm text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+        >
+          <mat-icon fontIcon="ph-house"></mat-icon>
+          Home
+        </a>
+        <a
+          routerLink="/settings"
+          routerLinkActive="bg-violet-50 dark:bg-violet-950 text-violet-700 dark:text-violet-300 font-semibold"
+          ariaCurrentWhenActive="page"
+          (click)="closeSidebar()"
+          class="flex items-center gap-3 px-2 py-2 rounded-lg text-sm text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+        >
+          <mat-icon fontIcon="ph-user-gear"></mat-icon>
+          User Settings
+        </a>
+      </section>
+
+      <div class="border-t border-zinc-100 dark:border-zinc-800" role="separator"></div>
+
+      <!-- Handler -->
+      <section>
+        <p class="px-2 pb-2 text-[10px] font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-600">
+          Handler
+        </p>
+        <a
+          routerLink="/enrolled-courses"
+          routerLinkActive="bg-violet-50 dark:bg-violet-950 text-violet-700 dark:text-violet-300 font-semibold"
+          ariaCurrentWhenActive="page"
+          (click)="closeSidebar()"
+          class="flex items-center gap-3 px-2 py-2 rounded-lg text-sm text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+        >
+          <mat-icon fontIcon="ph-graduation-cap"></mat-icon>
+          Enrolled Courses
+        </a>
+      </section>
+
+      <div class="border-t border-zinc-100 dark:border-zinc-800" role="separator"></div>
+
+      <!-- Trainer -->
+      <section>
+        <p class="px-2 pb-2 text-[10px] font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-600">
+          Trainer
+        </p>
+        <a
+          routerLink="/courses"
+          routerLinkActive="bg-violet-50 dark:bg-violet-950 text-violet-700 dark:text-violet-300 font-semibold"
+          ariaCurrentWhenActive="page"
+          (click)="closeSidebar()"
+          class="flex items-center gap-3 px-2 py-2 rounded-lg text-sm text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+        >
+          <mat-icon fontIcon="ph-book-open"></mat-icon>
+          Courses
+        </a>
+      </section>
+
+    </nav>
+
+    <!-- Footer: theme + sidebar toggle -->
+    <div class="border-t border-zinc-200 dark:border-zinc-800 px-3 py-3 flex items-center">
+      <button
+        (click)="theme.toggle()"
+        [attr.aria-label]="theme.isDark() ? 'Switch to light theme' : 'Switch to dark theme'"
+        class="flex items-center justify-center p-2 rounded-lg text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+      >
+        <mat-icon [fontIcon]="theme.isDark() ? 'ph-sun' : 'ph-moon'"></mat-icon>
+      </button>
+      <button
+        (click)="toggleFullscreen()"
+        [attr.aria-label]="isFullscreen() ? 'Close sidebar' : 'Expand sidebar'"
+        class="ml-auto flex items-center justify-center p-2 rounded-lg text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+      >
+        <mat-icon [fontIcon]="isFullscreen() ? 'ph-arrows-in' : 'ph-arrows-out'"></mat-icon>
+      </button>
+    </div>
+
+  </aside>
+
+  <!-- Mobile open button: fixed bottom-right, only when sidebar is closed -->
+  @if (!isFullscreen()) {
+    <button
+      class="fixed bottom-4 right-4 md:hidden flex items-center justify-center w-10 h-10 rounded-xl bg-white dark:bg-zinc-800 shadow-lg text-zinc-600 dark:text-zinc-400 cursor-pointer"
+      (click)="toggleFullscreen()"
+      aria-label="Open navigation menu"
+    >
+      <mat-icon fontIcon="ph-list"></mat-icon>
+    </button>
+  }
+
+  <!-- Main content -->
+  <main [class]="isFullscreen() ? 'hidden md:block flex-1 overflow-auto' : 'flex-1 overflow-auto'">
+    <router-outlet />
+  </main>
+
+</div>

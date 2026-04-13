@@ -5,21 +5,29 @@ import { onlyLoggedInGuard } from './guards/only-logged-in-guard';
 import { onlyLoggedOutGuard } from './guards/only-logged-out-guard';
 import { Courses } from './pages/courses/courses';
 import { CourseDetails } from './pages/courses/course-details/course-details';
+import { Space } from './pages/space/space';
 
 export const routes: Routes = [{
-  path: 'courses',
-  component: Courses,
-  canActivate: [onlyLoggedInGuard],
-  children: [{
-    path: ':id',
-    component: CourseDetails
-  }]
-}, {
   path: 'login',
   component: Login,
   canActivate: [onlyLoggedOutGuard]
 }, {
-  path: 'home',
-  component: Home,
-  canActivate: [onlyLoggedInGuard]
+  path: '',
+  component: Space,
+  canActivate: [onlyLoggedInGuard],
+  children: [{
+    path: '',
+    redirectTo: 'home',
+    pathMatch: 'full'
+  }, {
+    path: 'home',
+    component: Home
+  }, {
+    path: 'courses',
+    component: Courses,
+    children: [{
+      path: ':id',
+      component: CourseDetails
+    }]
+  }]
 }];

@@ -4,6 +4,7 @@ import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { HttpInterceptorFn, provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideStore } from '@ngrx/store';
+import { MAT_ICON_DEFAULT_OPTIONS } from '@angular/material/icon';
 
 import { userReducer } from './stores/user/user.reducer';
 import { SecurityService } from './services/security-service';
@@ -19,5 +20,6 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptors([withCredentialsInterceptor])),
     provideStore({ user: userReducer }),
     provideAppInitializer(() => inject(SecurityService).authenticate()),
+    { provide: MAT_ICON_DEFAULT_OPTIONS, useValue: { fontSet: 'ph' } },
   ],
 };
