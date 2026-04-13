@@ -21,10 +21,11 @@ export class SecurityService {
       password: btoa(creds.password)
     }).subscribe({
       next: (value) => {
-        this.store.dispatch(user.setUser({ user: value as any as User }))
+        this.store.dispatch(user.setUser({ user: value as any as User }));
+        this.router.navigateByUrl('/home');
       },
       error: () => {
-        this.store.dispatch(user.setUser({ user: 'Something went wrong' }))
+        this.store.dispatch(user.setUser({ user: 'Something went wrong' }));
       }
     });
   }

@@ -4,6 +4,7 @@ import { switchMap } from 'rxjs';
 import Appointment from '../../../entities/appointment.interface';
 import { AppointmentsService } from '../../../services/appointments-service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Location } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -20,6 +21,7 @@ export class CourseDetails implements OnInit {
   appointmentsService = inject(AppointmentsService);
   activatedRoute = inject(ActivatedRoute);
   dialog = inject(MatDialog);
+  private readonly location = inject(Location);
   private readonly destroyRef = inject(DestroyRef);
   appointments = signal(new Array<Appointment>);
   currentCourseId = signal(0);
@@ -34,6 +36,10 @@ export class CourseDetails implements OnInit {
     ).subscribe({
       next: (appointments) => this.appointments.set(appointments)
     });
+  }
+
+  goBack() {
+    this.location.back();
   }
 
   deleteAppointment(id: number) {

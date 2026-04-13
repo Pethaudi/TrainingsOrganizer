@@ -86,6 +86,7 @@ public class CourseController {
     }
 
     @GetMapping("/{courseId}/appointments")
+    @RequiresAuth()
     public Iterable<Appointment> getCoursesByUser(@PathVariable Integer courseId) {
         return this.appointmentRepository.findByCourseId(courseId);
     }
