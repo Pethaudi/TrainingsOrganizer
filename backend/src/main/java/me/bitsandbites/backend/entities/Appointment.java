@@ -1,5 +1,6 @@
 package me.bitsandbites.backend.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.Date;
@@ -11,6 +12,7 @@ public class Appointment {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Integer id;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "relationid", referencedColumnName = "id")
     private Course course;

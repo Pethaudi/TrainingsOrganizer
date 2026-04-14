@@ -2,17 +2,17 @@ package me.bitsandbites.backend.dtos;
 
 import me.bitsandbites.backend.entities.CourseTrainer;
 
-public class CourseDetailsDTO {
+public class CourseDTO {
     private Integer id;
     private String name;
     private Iterable<UserDTO> trainers;
 
-    public CourseDetailsDTO(Integer id, String name) {
+    public CourseDTO(Integer id, String name) {
         this.id = id;
         this.name = name;
     }
 
-    public CourseDetailsDTO(CourseTrainer course) {
+    public CourseDTO(CourseTrainer course) {
         this.id = course.getCourse().getId();
         this.name = course.getCourse().getName();
     }

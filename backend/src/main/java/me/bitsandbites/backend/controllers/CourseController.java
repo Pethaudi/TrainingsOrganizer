@@ -1,8 +1,9 @@
 package me.bitsandbites.backend.controllers;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.websocket.server.PathParam;
 import me.bitsandbites.backend.annotations.RequiresAuth;
-import me.bitsandbites.backend.dtos.CourseDetailsDTO;
+import me.bitsandbites.backend.dtos.CourseDTO;
 import me.bitsandbites.backend.dtos.CourseMinimumDTO;
 import me.bitsandbites.backend.dtos.Role;
 import me.bitsandbites.backend.dtos.UserDTO;
@@ -44,10 +45,11 @@ public class CourseController {
         this.appointmentRepository = appointmentRepository;
     }
 
+
     @PostMapping()
     @Transactional
     @RequiresAuth()
-    public CourseDetailsDTO createCourseDetails(@RequestBody CourseMinimumDTO courseMinimumDTO) {
+    public CourseDTO createCourseDetails(@RequestBody CourseMinimumDTO courseMinimumDTO) {
         var course = courseRepository.save(new Course(courseMinimumDTO.getName()));
         var trainers = StreamSupport.stream(courseMinimumDTO.getTrainers().spliterator(), false)
                 .map(registeredRepository::findById)
@@ -59,7 +61,7 @@ public class CourseController {
                 trainers.stream().map(trainer -> new CourseTrainer(course, trainer)).toList()
         );
 
-        var result = new CourseDetailsDTO(course.getId(), course.getName());
+        var result = new CourseDTO(course.getId(), course.getName());
         result.setTrainers(
             trainers.stream().map(trainer -> new UserDTO(trainer.getId(), trainer.getName(), Role.Trainer)).toList()
         );
@@ -68,13 +70,13 @@ public class CourseController {
 
     @GetMapping("/as-trainer")
     @RequiresAuth(role = Role.Trainer)
-    public List<CourseDetailsDTO> getCoursesOfAsTrainer(HttpServletRequest request) {
+    public List<CourseDTO> getCoursesOfAsTrainer(HttpServletRequest request) {
         var user = TokenParser.parseFromRequest(request);
         return courseTrainerRepository.findAllByCoursesOfTrainer(user.getId()).stream()
                 .collect(Collectors.groupingBy(ct -> ct.getCourse().getId()))
                 .values().stream()
                 .map(relations -> {
-                    var dto = new CourseDetailsDTO(relations.get(0));
+                    var dto = new CourseDTO(relations.get(0));
                     dto.setTrainers(
                             relations.stream()
                                     .map(ct -> new UserDTO(ct.getTrainer().getId(), ct.getTrainer().getName(), Role.Trainer))
@@ -83,6 +85,13 @@ public class CourseController {
                     return dto;
                 })
                 .toList();
+    }
+
+
+    @GetMapping("{courseId}")
+    @RequiresAuth(role = Role.Trainer)
+    public Course getCourseById(@PathVariable Integer courseId){
+        return this.courseRepository.findById(courseId).orElse(null);
     }
 
     @GetMapping("/{courseId}/appointments")

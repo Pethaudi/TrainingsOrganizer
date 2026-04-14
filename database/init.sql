@@ -20,9 +20,10 @@ CREATE TABLE Dogs (
 );
 
 CREATE TABLE DogTeams (
+  id SERIAL PRIMARY KEY,
   handlerId INTEGER NOT NULL REFERENCES Registered(id),
   dogId INTEGER NOT NULL REFERENCES Dogs(id),
-  PRIMARY KEY (handlerId, dogId)
+  UNIQUE (handlerId, dogId)
 );
 
 CREATE TABLE Courses (
@@ -33,9 +34,7 @@ CREATE TABLE Courses (
 CREATE TABLE CourseRegisters (
   id SERIAL PRIMARY KEY,
   courseId INTEGER NOT NULL REFERENCES Courses(id),
-  handlerId INTEGER NOT NULL REFERENCES Registered(id),
-  dogId INTEGER NOT NULL REFERENCES Dogs(id),
-  FOREIGN KEY (handlerId, dogId) REFERENCES DogTeams (handlerId, dogId)
+  dogTeamId INTEGER NOT NULL REFERENCES DogTeams(id)
 );
 
 CREATE TABLE CourseTrainers (
@@ -77,21 +76,18 @@ INSERT INTO DogTeams (handlerId, dogId)
 INSERT INTO Courses (name) VALUES ('Social Walk');
 INSERT INTO Courses (name) VALUES ('Grundkurs');
 
-INSERT INTO CourseRegisters (courseId, handlerId, dogId)
+INSERT INTO CourseRegisters (courseId, dogTeamId)
   SELECT
     (SELECT id FROM Courses WHERE name = 'Social Walk'),
-    (SELECT id FROM Registered WHERE name = 'Horst'),
-    (SELECT id FROM Dogs WHERE name = 'Günni');
-INSERT INTO CourseRegisters (courseId, handlerId, dogId)
+    (SELECT id FROM DogTeams WHERE handlerId = (SELECT id FROM Registered WHERE name = 'Horst') AND dogId = (SELECT id FROM Dogs WHERE name = 'Günni'));
+INSERT INTO CourseRegisters (courseId, dogTeamId)
   SELECT
     (SELECT id FROM Courses WHERE name = 'Grundkurs'),
-    (SELECT id FROM Registered WHERE name = 'Peter'),
-    (SELECT id FROM Dogs WHERE name = 'Alba');
-INSERT INTO CourseRegisters (courseId, handlerId, dogId)
+    (SELECT id FROM DogTeams WHERE handlerId = (SELECT id FROM Registered WHERE name = 'Peter') AND dogId = (SELECT id FROM Dogs WHERE name = 'Alba'));
+INSERT INTO CourseRegisters (courseId, dogTeamId)
   SELECT
     (SELECT id FROM Courses WHERE name = 'Grundkurs'),
-    (SELECT id FROM Registered WHERE name = 'Meli'),
-    (SELECT id FROM Dogs WHERE name = 'Ricco');
+    (SELECT id FROM DogTeams WHERE handlerId = (SELECT id FROM Registered WHERE name = 'Meli') AND dogId = (SELECT id FROM Dogs WHERE name = 'Ricco'));
 
 INSERT INTO CourseTrainers (courseId, trainerId)
   SELECT

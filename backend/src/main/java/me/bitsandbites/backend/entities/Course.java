@@ -1,10 +1,9 @@
 package me.bitsandbites.backend.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+
+import java.util.List;
 
 @Entity
 @Table(name = "courses")
@@ -13,6 +12,15 @@ public class Course {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Integer id;
     private String name;
+
+    @OneToMany(mappedBy = "course", fetch = FetchType.LAZY)
+    private List<Appointment> appointments;
+
+    @OneToMany(mappedBy = "course", fetch = FetchType.LAZY)
+    private List<CourseTrainer> trainers;
+
+    @OneToMany(mappedBy = "course", fetch = FetchType.LAZY)
+    private List<CourseRegister> registrations;
 
     public Course() {}
 
@@ -39,5 +47,17 @@ public class Course {
 
     public String getName() {
         return this.name;
+    }
+
+    public List<Appointment> getAppointments() {
+        return appointments;
+    }
+
+    public List<Registered> getTrainers() {
+        return trainers.stream().map(CourseTrainer::getTrainer).toList();
+    }
+
+    public List<DogTeam> getRegistrations() {
+        return registrations.stream().map(CourseRegister::getDogTeam).toList();
     }
 }

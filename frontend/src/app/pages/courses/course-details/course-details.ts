@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, OnInit, Signal, signal, WritableSignal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { switchMap } from 'rxjs';
@@ -10,6 +10,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { AddAppointment } from '../../../components/modals/add-appointment/add-appointment';
 import { MatDialog } from '@angular/material/dialog';
+import { CoursesService } from '../../../services/courses-service';
+import { Course } from '../../../entities/course.interface';
 
 @Component({
   selector: 'app-course-details',
@@ -20,24 +22,24 @@ import { MatDialog } from '@angular/material/dialog';
 })
 export class CourseDetails implements OnInit {
   private readonly appointmentsService = inject(AppointmentsService);
+  private readonly coursesService = inject(CoursesService);
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly dialog = inject(MatDialog);
   private readonly location = inject(Location);
   private readonly destroyRef = inject(DestroyRef);
 
-  readonly appointments = signal(new Array<Appointment>());
+  readonly course: WritableSignal<Course | null> = signal(null);
   readonly currentCourseId = signal(0);
-  readonly courseName = computed(() => this.appointments()[0]?.course?.name ?? 'Course');
 
   ngOnInit(): void {
     this.activatedRoute.params.pipe(
       switchMap((params) => {
         this.currentCourseId.set(+params['id']);
-        return this.appointmentsService.fetchAppointments(this.currentCourseId());
+        return this.coursesService.fetchCourse(this.currentCourseId());
       }),
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
-      next: (appointments) => this.appointments.set(appointments)
+      next: (course) => this.course.set(course)
     });
   }
 
@@ -47,7 +49,10 @@ export class CourseDetails implements OnInit {
 
   deleteAppointment(id: number) {
     this.appointmentsService.deleteAppointment(id).subscribe({
-      next: () => this.appointments.set(this.appointments().filter(a => a.id !== id))
+      next: () => this.course.set({
+        ...this.course()!,
+        appointments: this.course()?.appointments?.filter(course => course.id !== id) ?? []
+      })
     });
   }
 
@@ -60,7 +65,10 @@ export class CourseDetails implements OnInit {
             note: result.note,
             date: new Date(result.date).toISOString()
           }).subscribe({
-            next: (appointment) => this.appointments.set([...this.appointments(), appointment])
+            next: (appointment) => this.course.set({
+              ...this.course()!,
+              appointments: [...(this.course()?.appointments ?? []), appointment]
+            })
           });
         }
       }

@@ -1,5 +1,6 @@
 package me.bitsandbites.backend.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity(name = "coursetrainers")
@@ -14,6 +15,7 @@ public class CourseTrainer {
     @JoinColumn(name = "trainerid", referencedColumnName = "id")
     private Registered trainer;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "courseid", referencedColumnName = "id")
     private Course course;
