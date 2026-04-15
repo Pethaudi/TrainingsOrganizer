@@ -8,6 +8,7 @@ ENV POSTGRES_USER=$DB_USER
 ENV POSTGRES_PASSWORD=$DB_PASSWORD
 ENV POSTGRES_DB=$DB_NAME
 
-COPY init.sql /docker-entrypoint-initdb.d/init.sql
+COPY schema.sql /docker-entrypoint-initdb.d/01_schema.sql
+COPY sample_data.sql /docker-entrypoint-initdb.d/02_sample_data.sql
 
 EXPOSE 5432
