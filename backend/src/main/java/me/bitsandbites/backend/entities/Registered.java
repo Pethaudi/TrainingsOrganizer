@@ -1,9 +1,8 @@
 package me.bitsandbites.backend.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+
+import java.util.List;
 
 @Entity
 public class Registered {
@@ -11,6 +10,16 @@ public class Registered {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Integer id;
     private String name;
+    private String address;
+
+    // https://www.baeldung.com/jpa-many-to-many
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "membersoforganisation",
+        joinColumns = @JoinColumn(name = "registeredid"),
+        inverseJoinColumns = @JoinColumn(name = "organisationid")
+    )
+    private List<Organisation> organisations;
 
     public Registered() {}
 
@@ -33,5 +42,17 @@ public class Registered {
 
     public String getName() {
         return this.name;
+    }
+
+    public String getAddress() {
+        return this.address;
+    }
+
+    public List<Organisation> getOrganisations() {
+        return organisations;
+    }
+
+    public void setOrganisations(List<Organisation> organisations) {
+        this.organisations = organisations;
     }
 }

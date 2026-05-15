@@ -14,8 +14,8 @@ public interface RegisteredRepository extends JpaRepository<Registered, Integer>
     boolean isTrainer(@Param("name") String name);
 
     @Query(
-            value = "SELECT * FROM registered WHERE name = ?1 AND password = crypt(?2, 'md5')",
+            value = "SELECT * FROM registered WHERE name = :name AND password = md5(:password)",
             nativeQuery = true
     )
-    Optional<Registered> authenticateUser(String name, String password);
+    Optional<Registered> authenticateUser(@Param("name") String name, @Param("password") String password);
 }

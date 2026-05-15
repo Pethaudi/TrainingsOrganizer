@@ -1,7 +1,6 @@
 package me.bitsandbites.backend.controllers;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.websocket.server.PathParam;
 import me.bitsandbites.backend.annotations.RequiresAuth;
 import me.bitsandbites.backend.dtos.CourseDTO;
 import me.bitsandbites.backend.dtos.CourseMinimumDTO;
@@ -26,14 +25,14 @@ import java.util.stream.StreamSupport;
 
 @RestController()
 @RequestMapping("courses")
-public class CourseController {
+public class CoursesController {
     private final CourseTrainerRepository courseTrainerRepository;
     private final CourseRepository courseRepository;
     private final RegisteredRepository registeredRepository;
     private final AppointmentRepository appointmentRepository;
 
     @Autowired
-    public CourseController(
+    public CoursesController(
             CourseTrainerRepository courseTrainerRepository,
             CourseRepository courseRepository,
             RegisteredRepository registeredRepository,
@@ -63,13 +62,13 @@ public class CourseController {
 
         var result = new CourseDTO(course.getId(), course.getName());
         result.setTrainers(
-            trainers.stream().map(trainer -> new UserDTO(trainer.getId(), trainer.getName(), Role.Trainer)).toList()
+            trainers.stream().map(trainer -> new UserDTO(trainer.getId(), trainer.getName(), Role.trainer)).toList()
         );
         return result;
     }
 
     @GetMapping("/as-trainer")
-    @RequiresAuth(role = Role.Trainer)
+    @RequiresAuth(role = Role.trainer)
     public List<CourseDTO> getCoursesOfAsTrainer(HttpServletRequest request) {
         var user = TokenParser.parseFromRequest(request);
         return courseTrainerRepository.findAllByCoursesOfTrainer(user.getId()).stream()
@@ -79,7 +78,7 @@ public class CourseController {
                     var dto = new CourseDTO(relations.get(0));
                     dto.setTrainers(
                             relations.stream()
-                                    .map(ct -> new UserDTO(ct.getTrainer().getId(), ct.getTrainer().getName(), Role.Trainer))
+                                    .map(ct -> new UserDTO(ct.getTrainer().getId(), ct.getTrainer().getName(), Role.trainer))
                                     .toList()
                     );
                     return dto;
@@ -89,7 +88,7 @@ public class CourseController {
 
 
     @GetMapping("{courseId}")
-    @RequiresAuth(role = Role.Trainer)
+    @RequiresAuth(role = Role.trainer)
     public Course getCourseById(@PathVariable Integer courseId){
         return this.courseRepository.findById(courseId).orElse(null);
     }

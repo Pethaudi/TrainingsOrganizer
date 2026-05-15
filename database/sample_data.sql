@@ -18,34 +18,34 @@ INSERT INTO Organisations (name, address) VALUES
 -- ============================================================
 INSERT INTO Registered (name, password) VALUES
   -- Org 1 trainers
-  ('Sarah Johnson',  crypt('sarah123',   gen_salt('bf'))),
-  ('James Carter',   crypt('james123',   gen_salt('bf'))),
-  ('Emma Wilson',    crypt('emma123',    gen_salt('bf'))),
-  ('Lucas Martin',   crypt('lucas123',   gen_salt('bf'))),
-  ('Sophie Taylor',  crypt('sophie123',  gen_salt('bf'))),
+  ('Sarah',    md5('sarah123')),
+  ('James',    md5('james123')),
+  ('Emma',     md5('emma123')),
+  ('Lucas',    md5('lucas123')),
+  ('Sophie',   md5('sophie123')),
   -- Org 2 trainers
-  ('Daniel Kim',     crypt('daniel123',  gen_salt('bf'))),
-  ('Olivia Chen',    crypt('olivia123',  gen_salt('bf'))),
-  ('Ryan Murphy',    crypt('ryan123',    gen_salt('bf'))),
-  ('Isabella Costa', crypt('isabella123',gen_salt('bf'))),
-  ('Noah Bennett',   crypt('noah123',    gen_salt('bf'))),
+  ('Daniel',   md5('daniel123')),
+  ('Olivia',   md5('olivia123')),
+  ('Ryan',     md5('ryan123')),
+  ('Isabella', md5('isabella123')),
+  ('Noah',     md5('noah123')),
   -- Org 3 trainers
-  ('Mia Rodriguez',  crypt('mia123',     gen_salt('bf'))),
-  ('Ethan Brooks',   crypt('ethan123',   gen_salt('bf'))),
-  ('Chloe Dubois',   crypt('chloe123',   gen_salt('bf'))),
-  ('Liam O''Brien',  crypt('liam123',    gen_salt('bf'))),
-  ('Zoe Nakamura',   crypt('zoe123',     gen_salt('bf'))),
+  ('Mia',      md5('mia123')),
+  ('Ethan',    md5('ethan123')),
+  ('Chloe',    md5('chloe123')),
+  ('Liam',     md5('liam123')),
+  ('Zoe',      md5('zoe123')),
   -- Handlers
-  ('Jack Harris',    crypt('jack123',    gen_salt('bf'))),
-  ('Emily Clark',    crypt('emily123',   gen_salt('bf'))),
-  ('Sam Rivera',     crypt('sam123',     gen_salt('bf'))),
-  ('Laura Thompson', crypt('laura123',   gen_salt('bf'))),
-  ('Ben Walker',     crypt('ben123',     gen_salt('bf'))),
-  ('Amy Foster',     crypt('amy123',     gen_salt('bf'))),
-  ('Tom Mitchell',   crypt('tom123',     gen_salt('bf'))),
-  ('Rachel Green',   crypt('rachel123',  gen_salt('bf'))),
-  ('Chris Evans',    crypt('chris123',   gen_salt('bf'))),
-  ('Kate Morgan',    crypt('kate123',    gen_salt('bf')));
+  ('Jack',     md5('jack123')),
+  ('Emily',    md5('emily123')),
+  ('Sam',      md5('sam123')),
+  ('Laura',    md5('laura123')),
+  ('Ben',      md5('ben123')),
+  ('Amy',      md5('amy123')),
+  ('Tom',      md5('tom123')),
+  ('Rachel',   md5('rachel123')),
+  ('Chris',    md5('chris123')),
+  ('Kate',     md5('kate123'));
 
 -- ============================================================
 -- MembersOfOrganisation (trainers + handlers with roles)

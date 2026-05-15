@@ -44,7 +44,7 @@ public class AuthAspect {
 
         Role[] requiredRoles = requiresAuth.role();
         if (requiredRoles.length > 0) {
-            var userRole = Role.valueOf(tokenValue.getString("role"));
+            var userRole = Role.valueOf(tokenValue.getString("role").toLowerCase());
             var hasRole = Arrays.stream(requiredRoles).anyMatch(r -> r == userRole);
             if (!hasRole) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN);

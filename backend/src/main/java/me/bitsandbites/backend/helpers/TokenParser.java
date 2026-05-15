@@ -35,7 +35,7 @@ public class TokenParser {
         return new UserDTO(
                 tokenValue.getInt("id"),
                 tokenValue.getString("username"),
-                tokenValue.getEnum(Role.class, "role")
+                Role.valueOf(tokenValue.getString("role").toLowerCase())
         );
     }
 }

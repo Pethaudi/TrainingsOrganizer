@@ -71,7 +71,7 @@ public class SecurityController {
         if (user.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
         } else {
-            var userRole = repo.isTrainer(creds.getUsername()) ? Role.Trainer : Role.User;
+            var userRole = repo.isTrainer(creds.getUsername()) ? Role.trainer : Role.member;
             var token = Base64.getEncoder().encodeToString(
                     creds.toString(user.get().getId(), userRole).getBytes()
             );
@@ -108,7 +108,7 @@ public class SecurityController {
                 return new UserDTO(
                         tokenValue.getInt("id"),
                         tokenValue.getString("username"),
-                        Role.valueOf(tokenValue.getString("role"))
+                        Role.valueOf(tokenValue.getString("role").toLowerCase())
                 );
             } else {
                 throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);

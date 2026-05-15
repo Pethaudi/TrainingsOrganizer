@@ -15,12 +15,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController()
 @RequestMapping("appointments")
-public class AppointmentController {
+public class AppointmentsController {
     private final AppointmentRepository appointmentRepository;
     private final CourseRepository courseRepository;
 
     @Autowired
-    public AppointmentController(
+    public AppointmentsController(
             AppointmentRepository appointmentRepository,
             CourseRepository courseRepository
     ) {
