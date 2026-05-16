@@ -5,4 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MembersOfOrganisationRepository extends JpaRepository<MemberOfOrganisation, Integer> {
     Iterable<MemberOfOrganisation> findByRegisteredId(Integer id);
+    <T> Iterable<T> findByRegisteredId(Integer id, Class<T> type);
 }
