@@ -1,10 +1,11 @@
 package me.bitsandbites.backend.controllers;
 
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import me.bitsandbites.backend.dtos.Role;
 import me.bitsandbites.backend.dtos.UserDTO;
+import me.bitsandbites.backend.entities.MemberOfOrganisationView;
+import me.bitsandbites.backend.repositories.MembersOfOrganisationRepository;
 import me.bitsandbites.backend.repositories.RegisteredRepository;
 import org.json.JSONObject;
 import org.json.JSONStringer;
@@ -16,6 +17,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Objects;
+import java.util.stream.StreamSupport;
 
 class Credentials {
     private String username;
@@ -58,10 +60,12 @@ class Credentials {
 public class SecurityController {
 
     private final RegisteredRepository repo;
+    private final MembersOfOrganisationRepository membersOfOrganisationRepositoryRepo;
 
     @Autowired
-    public SecurityController(RegisteredRepository repo) {
+    public SecurityController(RegisteredRepository repo, MembersOfOrganisationRepository membersOfOrganisationRepositoryRepo) {
         this.repo = repo;
+        this.membersOfOrganisationRepositoryRepo = membersOfOrganisationRepositoryRepo;
     }
 
     @PostMapping("/login")
@@ -83,7 +87,7 @@ public class SecurityController {
             return new UserDTO(
                     user.get().getId(),
                     creds.getUsername(),
-                    userRole
+                    StreamSupport.stream(membersOfOrganisationRepositoryRepo.findByRegisteredId(user.get().getId(), MemberOfOrganisationView.class).spliterator(), false).toList()
             );
         }
     }
@@ -105,10 +109,11 @@ public class SecurityController {
             var username = tokenValue.getString("username");
             var password = new String(Base64.getDecoder().decode(tokenValue.getString("password").getBytes()));
             if (repo.authenticateUser(username, password).isPresent()) {
+                var id = tokenValue.getInt("id");
                 return new UserDTO(
-                        tokenValue.getInt("id"),
+                        id,
                         tokenValue.getString("username"),
-                        Role.valueOf(tokenValue.getString("role").toLowerCase())
+                        StreamSupport.stream(membersOfOrganisationRepositoryRepo.findByRegisteredId(id, MemberOfOrganisationView.class).spliterator(), false).toList()
                 );
             } else {
                 throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);

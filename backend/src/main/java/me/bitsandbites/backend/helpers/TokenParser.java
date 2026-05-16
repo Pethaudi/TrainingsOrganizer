@@ -4,6 +4,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import me.bitsandbites.backend.dtos.Role;
 import me.bitsandbites.backend.dtos.UserDTO;
+import me.bitsandbites.backend.repositories.MembersOfOrganisationRepository;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
@@ -32,10 +33,10 @@ public class TokenParser {
 
     public static UserDTO parseFromRequest(HttpServletRequest request) {
         var tokenValue = parseRawToken(request);
+        var id = tokenValue.getInt("id");
         return new UserDTO(
-                tokenValue.getInt("id"),
-                tokenValue.getString("username"),
-                Role.valueOf(tokenValue.getString("role").toLowerCase())
+                id,
+                tokenValue.getString("username")
         );
     }
 }

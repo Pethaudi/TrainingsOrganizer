@@ -28,6 +28,10 @@ public class Organisation {
         );
     }
 
+    public void  setId(Integer id) {
+        this.id = id;
+    }
+
     public Integer getId() {
         return this.id;
     }
@@ -36,8 +40,16 @@ public class Organisation {
         return this.name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getAddress() {
         return this.address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     @Override

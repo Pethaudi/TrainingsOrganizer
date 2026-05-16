@@ -1,14 +1,13 @@
 package me.bitsandbites.backend.dtos;
 
-import me.bitsandbites.backend.entities.Organisation;
+import me.bitsandbites.backend.entities.MemberOfOrganisation;
 import me.bitsandbites.backend.entities.Registered;
 import java.util.List;
 
 public class UserDTO {
     private Integer id;
     private String name;
-    private Role role;
-    private List<Organisation>  organisations;
+    private List<MemberOfOrganisation> memberOfOrganisations;
 
     public UserDTO(Integer id, String name) {
         this.id = id;
@@ -20,17 +19,10 @@ public class UserDTO {
         this.name = registered.getName();
     }
 
-    public UserDTO(Integer id, String name, Role role) {
+    public UserDTO(Integer id, String name, List<MemberOfOrganisation> memberOfOrganisations) {
         this.id = id;
         this.name = name;
-        this.role = role;
-    }
-
-    public UserDTO(Integer id, String name, Role role, List<Organisation> organisations) {
-        this.id = id;
-        this.name = name;
-        this.role = role;
-        this.organisations = organisations;
+        this.memberOfOrganisations = memberOfOrganisations;
     }
 
     public Integer getId() {
@@ -49,19 +41,11 @@ public class UserDTO {
         this.name = name;
     }
 
-    public Role getRole() {
-        return role;
+    public List<MemberOfOrganisation> getMemberOfOrganisations() {
+        return memberOfOrganisations;
     }
 
-    public void setRole(Role role) {
-        this.role = role;
-    }
-
-    public List<Organisation> getOrganisations() {
-        return organisations;
-    }
-
-    public void setOrganisations(List<Organisation> organisations) {
-        this.organisations = organisations;
+    public void setMemberOfOrganisations(List<MemberOfOrganisation> memberOfOrganisations) {
+        this.memberOfOrganisations = memberOfOrganisations;
     }
 }

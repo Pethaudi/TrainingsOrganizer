@@ -48,42 +48,12 @@ public class CoursesController {
     @PostMapping()
     @Transactional
     @RequiresAuth()
-    public CourseDTO createCourseDetails(@RequestBody CourseMinimumDTO courseMinimumDTO) {
-        var course = courseRepository.save(new Course(courseMinimumDTO.getName()));
-        var trainers = StreamSupport.stream(courseMinimumDTO.getTrainers().spliterator(), false)
-                .map(registeredRepository::findById)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .toList();
-
-        this.courseTrainerRepository.saveAll(
-                trainers.stream().map(trainer -> new CourseTrainer(course, trainer)).toList()
-        );
-
-        var result = new CourseDTO(course.getId(), course.getName());
-        result.setTrainers(
-            trainers.stream().map(trainer -> new UserDTO(trainer.getId(), trainer.getName(), Role.trainer)).toList()
-        );
-        return result;
+    public void createCourseDetails(@RequestBody CourseMinimumDTO courseMinimumDTO) {
     }
 
     @GetMapping("/as-trainer")
     @RequiresAuth(role = Role.trainer)
-    public List<CourseDTO> getCoursesOfAsTrainer(HttpServletRequest request) {
-        var user = TokenParser.parseFromRequest(request);
-        return courseTrainerRepository.findAllByCoursesOfTrainer(user.getId()).stream()
-                .collect(Collectors.groupingBy(ct -> ct.getCourse().getId()))
-                .values().stream()
-                .map(relations -> {
-                    var dto = new CourseDTO(relations.get(0));
-                    dto.setTrainers(
-                            relations.stream()
-                                    .map(ct -> new UserDTO(ct.getTrainer().getId(), ct.getTrainer().getName(), Role.trainer))
-                                    .toList()
-                    );
-                    return dto;
-                })
-                .toList();
+    public void getCoursesOfAsTrainer(HttpServletRequest request) {
     }
 
 
