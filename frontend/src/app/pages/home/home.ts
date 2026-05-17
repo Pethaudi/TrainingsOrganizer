@@ -1,18 +1,24 @@
-import { ChangeDetectionStrategy, Component, effect, inject, OnInit, Signal, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import CourseDetails from '../../entities/course-details.interface';
 import { CoursesService } from '../../services/courses-service';
 import { Store } from '@ngrx/store';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-
-import {
-  MatDialog,
-} from '@angular/material/dialog';
-import { AddCourse } from '../../components/modals/add-course/add-course';
-import { selectUserId } from '../../stores/user/user.selectors';
+import { MatDialog } from '@angular/material/dialog';
+import { selectUserOrganisations } from '../../stores/user/user.selectors';
 import { OrganisationDto } from '../../entities/organisation-dto.interface';
-import { OrganisationsService } from '../../services/organisations-service';
+import { Role } from '../../entities/member-of-organisation.interface';
+import { forkJoin, of } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+
+interface OrgWithCourses {
+  organisation: OrganisationDto;
+  role: Role;
+  trainerCourses: CourseDetails[];
+  memberCourses: CourseDetails[];
+}
 
 @Component({
   selector: 'app-home',
@@ -21,45 +27,35 @@ import { OrganisationsService } from '../../services/organisations-service';
   styleUrl: './home.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Home implements OnInit {
+export class Home {
   private readonly coursesService = inject(CoursesService);
-  private readonly organisationsService = inject(OrganisationsService);
-  private readonly userId: Signal<number | null> = inject(Store).selectSignal(selectUserId);
-  private readonly dialog = inject(MatDialog)
-  
-  readonly coursesAsTrainer = signal(new Array<CourseDetails>());
-  readonly organisationsOfUser = signal(new Array<OrganisationDto>());
+  readonly dialog = inject(MatDialog);
 
-  constructor() {
-    effect(() => console.log(this.coursesAsTrainer()));
-  }
+  private readonly memberOfOrganisations = inject(Store).selectSignal(selectUserOrganisations);
 
-  ngOnInit() {
-    this.coursesService.fetchCoursesToTeach()
-      .subscribe({
-        next: (courses) => this.coursesAsTrainer.set(courses)
-    });
+  readonly orgsWithCourses = toSignal(
+    toObservable(this.memberOfOrganisations).pipe(
+      switchMap(memberships => {
+        if (!memberships?.length) return of([]);
 
-    this.organisationsService.fetchOrganisationsOfCurrentUser()
-      .subscribe({
-        next: (orgs) => this.organisationsOfUser.set(orgs)
-      });
-  }
+        const requests = memberships.map(m => {
+          const member$ = this.coursesService.fetchCoursesAsMember(m.organisation.id);
 
-  openAddCourse() {
-    this.dialog.open(AddCourse).afterClosed().subscribe({
-      next: (result: { name: string } | undefined) => {
-        if (result) {
-          this.coursesService.createCourse({
-            name: result.name,
-            trainers: [this.userId() ?? 0]
-          }).subscribe({
-            next: (newCourse) => {
-              this.coursesAsTrainer.update(courses => [...courses, newCourse]);
-            }
-          })
-        }
-      }
-    });
-  }
+          if (m.role === 'member') {
+            return member$.pipe(
+              map(memberCourses => ({ organisation: m.organisation, role: m.role, trainerCourses: [], memberCourses }))
+            );
+          }
+
+          return forkJoin({
+            trainerCourses: this.coursesService.fetchCoursesAsTrainer(m.organisation.id),
+            memberCourses: member$,
+          }).pipe(map(courses => ({ organisation: m.organisation, role: m.role, ...courses })));
+        });
+
+        return forkJoin(requests);
+      })
+    ),
+    { initialValue: [] as OrgWithCourses[] }
+  );
 }

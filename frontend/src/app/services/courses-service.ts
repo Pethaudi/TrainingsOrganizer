@@ -11,8 +11,12 @@ export class CoursesService {
 
   private readonly http = inject(HttpClient);
 
-  fetchCoursesToTeach() {
-    return this.http.get<Array<CourseDetails>>(this.baseUrl + 'courses/as-trainer');
+  fetchCoursesAsTrainer(organisationId: number) {
+    return this.http.get<Array<CourseDetails>>(this.baseUrl + `organisations/${organisationId}/as-trainer`);
+  }
+
+  fetchCoursesAsMember(organisationId: number) {
+    return this.http.get<Array<CourseDetails>>(this.baseUrl + `organisations/${organisationId}/as-member`);
   }
 
   createCourse(course: {

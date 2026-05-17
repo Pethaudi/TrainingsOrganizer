@@ -2,12 +2,19 @@
 -- Run this after schema.sql (or init.sql without inserts).
 
 -- ============================================================
--- Organisations (3)
+-- Organisations (5)
+--   1 = HSS Vöcklabruck      (Sarah: admin)
+--   2 = Hundesportverein Wien
+--   3 = Agility Club Salzburg
+--   4 = Hundeclub Linz        (Sarah: trainer, trains courses 16–18)
+--   5 = Rassehunde Innsbruck  (Sarah: member, registered in courses 19–20)
 -- ============================================================
 INSERT INTO Organisations (name, address) VALUES
   ('HSS Vöcklabruck',       'Gegenüber vom Hellweg, 4840 Vöcklabruck'),
   ('Hundesportverein Wien',  'Prater Hauptallee 42, 1020 Wien'),
-  ('Agility Club Salzburg',  'Alpenstraße 88, 5020 Salzburg');
+  ('Agility Club Salzburg',  'Alpenstraße 88, 5020 Salzburg'),
+  ('Hundeclub Linz',         'Landstraße 17, 4020 Linz'),
+  ('Rassehunde Innsbruck',   'Innrain 3, 6020 Innsbruck');
 
 -- ============================================================
 -- Registered users
@@ -62,10 +69,14 @@ INSERT INTO MembersOfOrganisation (registeredId, organisationId, role) VALUES
   -- Org 3
   (11, 3, 'admin'),
   (12, 3, 'trainer'), (13, 3, 'trainer'), (14, 3, 'trainer'), (15, 3, 'trainer'),
-  (21, 3, 'member'),  (22, 3, 'member');
+  (21, 3, 'member'),  (22, 3, 'member'),
+  -- Org 4: Sarah as trainer
+  (1,  4, 'trainer'),
+  -- Org 5: Sarah as member
+  (1,  5, 'member');
 
 -- ============================================================
--- Dogs (one per handler, IDs 1–10 matching handler offsets)
+-- Dogs (IDs 1–10 for handlers, ID 11 for Sarah)
 -- ============================================================
 INSERT INTO Dogs (name) VALUES
   ('Rex'),    -- 1  → Hans Bauer   (16)
@@ -77,7 +88,8 @@ INSERT INTO Dogs (name) VALUES
   ('Bruno'),  -- 7  → Inge Wolf    (22)
   ('Nala'),   -- 8  → Rudi Mayer   (23)
   ('Leo'),    -- 9  → Claudia Braun(24)
-  ('Coco');   -- 10 → Werner Kern  (25)
+  ('Coco'),   -- 10 → Werner Kern  (25)
+  ('Bella');  -- 11 → Sarah        (1)
 
 -- ============================================================
 -- DogTeams
@@ -92,13 +104,16 @@ INSERT INTO DogTeams (handlerId, dogId) VALUES
   (22, 7),   -- 7  Inge   + Bruno
   (23, 8),   -- 8  Rudi   + Nala
   (24, 9),   -- 9  Claudia+ Leo
-  (25, 10);  -- 10 Werner + Coco
+  (25, 10),  -- 10 Werner + Coco
+  (1,  11);  -- 11 Sarah  + Bella
 
 -- ============================================================
 -- Courses (5 per organisation)
 --   IDs  1–5   → org 1
 --   IDs  6–10  → org 2
 --   IDs 11–15  → org 3
+--   IDs 16–18  → org 4 (Sarah trains all 3)
+--   IDs 19–20  → org 5 (Sarah registered as member)
 -- ============================================================
 INSERT INTO Courses (name) VALUES
   -- Org 1
@@ -118,7 +133,14 @@ INSERT INTO Courses (name) VALUES
   ('Agility Advanced'),      -- 12
   ('Turnierhundsport'),      -- 13
   ('Flyball Basics'),        -- 14
-  ('Disc Dog Intro');        -- 15
+  ('Disc Dog Intro'),        -- 15
+  -- Org 4 (Hundeclub Linz) – Sarah is trainer
+  ('Mantrailing Einführung'),-- 16
+  ('Nosework Basics'),       -- 17
+  ('Trickdogging'),          -- 18
+  -- Org 5 (Rassehunde Innsbruck) – Sarah is member
+  ('Clicker Training'),      -- 19
+  ('Gehorsamkeitstraining'); -- 20
 
 -- ============================================================
 -- CoursesOfOrganisation
@@ -129,45 +151,55 @@ INSERT INTO CoursesOfOrganisation (courseId, organisationId) VALUES
   -- Org 2
   (6,  2), (7,  2), (8,  2), (9,  2), (10, 2),
   -- Org 3
-  (11, 3), (12, 3), (13, 3), (14, 3), (15, 3);
+  (11, 3), (12, 3), (13, 3), (14, 3), (15, 3),
+  -- Org 4
+  (16, 4), (17, 4), (18, 4),
+  -- Org 5
+  (19, 5), (20, 5);
 
 -- ============================================================
 -- CourseTrainers
 -- ============================================================
 INSERT INTO CourseTrainers (courseId, trainerId) VALUES
   -- Org 1 courses
-  (1,  1), (1,  2),   -- Grundkurs A:       Anna, Thomas
-  (2,  2), (2,  3),   -- Grundkurs B:       Thomas, Eva
-  (3,  3), (3,  5),   -- Social Walk:       Eva, Sandra
-  (4,  4),            -- Agility Anfänger:  Markus
-  (5,  5), (5,  1),   -- Rally Obedience:  Sandra, Anna
+  (1,  1), (1,  2),   -- Grundkurs A:          Sarah, James
+  (2,  2), (2,  3),   -- Grundkurs B:          James, Emma
+  (3,  3), (3,  5),   -- Social Walk:          Emma, Sophie
+  (4,  4),            -- Agility Anfänger:     Lucas
+  (5,  5), (5,  1),   -- Rally Obedience:      Sophie, Sarah
   -- Org 2 courses
-  (6,  6), (6,  7),   -- Welpengruppe:      Michael, Lisa
-  (7,  7),            -- Junghundekurs:     Lisa
-  (8,  8), (8,  9),   -- Begleithund BH:    Stefan, Petra
-  (9,  9), (9,  10),  -- Fährte Anfänger:   Petra, Klaus
-  (10, 10),(10, 6),   -- Schutzdienst:      Klaus, Michael
+  (6,  6), (6,  7),   -- Welpengruppe:         Daniel, Olivia
+  (7,  7),            -- Junghundekurs:        Olivia
+  (8,  8), (8,  9),   -- Begleithund BH:       Ryan, Isabella
+  (9,  9), (9,  10),  -- Fährte Anfänger:      Isabella, Noah
+  (10, 10),(10, 6),   -- Schutzdienst:         Noah, Daniel
   -- Org 3 courses
-  (11, 11),(11, 12),  -- Agility Starter:   Julia, Florian
-  (12, 12),(12, 13),  -- Agility Advanced:  Florian, Maria
-  (13, 14),           -- Turnierhundsport:  Andreas
-  (14, 15),(14, 11),  -- Flyball Basics:    Sabine, Julia
-  (15, 13),(15, 14);  -- Disc Dog Intro:    Maria, Andreas
+  (11, 11),(11, 12),  -- Agility Starter:      Mia, Ethan
+  (12, 12),(12, 13),  -- Agility Advanced:     Ethan, Chloe
+  (13, 14),           -- Turnierhundsport:     Liam
+  (14, 15),(14, 11),  -- Flyball Basics:       Zoe, Mia
+  (15, 13),(15, 14),  -- Disc Dog Intro:       Chloe, Liam
+  -- Org 4 courses (Sarah trains all 3)
+  (16, 1),            -- Mantrailing Einführung: Sarah
+  (17, 1),            -- Nosework Basics:        Sarah
+  (18, 1);            -- Trickdogging:           Sarah
 
 -- ============================================================
 -- CourseRegisters (each dog team in at most one course)
 -- ============================================================
 INSERT INTO CourseRegisters (courseId, dogTeamId) VALUES
-  (1,  1),   -- Grundkurs A       ← Hans + Rex
-  (3,  2),   -- Social Walk       ← Gabi + Luna
-  (6,  3),   -- Welpengruppe      ← Otto + Bello
-  (7,  4),   -- Junghundekurs     ← Renate + Lassie
-  (8,  5),   -- Begleithund BH    ← Franz + Max
-  (11, 6),   -- Agility Starter   ← Helga + Zara
-  (12, 7),   -- Agility Advanced  ← Inge + Bruno
-  (2,  8),   -- Grundkurs B       ← Rudi + Nala
-  (13, 9),   -- Turnierhundsport  ← Claudia + Leo
-  (5,  10);  -- Rally Obedience   ← Werner + Coco
+  (1,  1),   -- Grundkurs A           ← Hans + Rex
+  (3,  2),   -- Social Walk           ← Gabi + Luna
+  (6,  3),   -- Welpengruppe          ← Otto + Bello
+  (7,  4),   -- Junghundekurs         ← Renate + Lassie
+  (8,  5),   -- Begleithund BH        ← Franz + Max
+  (11, 6),   -- Agility Starter       ← Helga + Zara
+  (12, 7),   -- Agility Advanced      ← Inge + Bruno
+  (2,  8),   -- Grundkurs B           ← Rudi + Nala
+  (13, 9),   -- Turnierhundsport      ← Claudia + Leo
+  (5,  10),  -- Rally Obedience       ← Werner + Coco
+  (19, 11),  -- Clicker Training      ← Sarah + Bella
+  (20, 11);  -- Gehorsamkeitstraining ← Sarah + Bella
 
 -- ============================================================
 -- Appointments (2 per course)
@@ -205,4 +237,16 @@ INSERT INTO Appointments (relationId, date, note) VALUES
   (14, '2026-04-22', 'Flyball – Boxtraining'),
   (14, '2026-04-29', 'Flyball – Staffellauf'),
   (15, '2026-04-23', 'Disc Dog – Einführung Werftechnik'),
-  (15, '2026-04-30', 'Disc Dog – Fangübungen auf Distanz');
+  (15, '2026-04-30', 'Disc Dog – Fangübungen auf Distanz'),
+  -- Org 4
+  (16, '2026-05-10', 'Mantrailing – Einführung und Grundübungen'),
+  (16, '2026-05-17', 'Mantrailing – Stadtgelände'),
+  (17, '2026-05-12', 'Nosework – Geruchsdifferenzierung'),
+  (17, '2026-05-19', 'Nosework – Suchentraining im Raum'),
+  (18, '2026-05-14', 'Trickdogging – Sit Pretty und Spin'),
+  (18, '2026-05-21', 'Trickdogging – Kombinationsübungen'),
+  -- Org 5
+  (19, '2026-05-11', 'Clicker Training – Grundlagen'),
+  (19, '2026-05-18', 'Clicker Training – Aufbautraining'),
+  (20, '2026-05-13', 'Gehorsamkeit – Grundkommandos'),
+  (20, '2026-05-20', 'Gehorsamkeit – Ablenkungstraining');

@@ -43,3 +43,14 @@ export const selectUserId = createSelector(
     }
   }
 );
+
+export const selectUserOrganisations = createSelector(
+  selectUser,
+  (state: UserState) => {
+    if (state.user !== null && typeof state.user === 'object') {
+      return (state.user as User).memberOfOrganisations;
+    } else {
+      return null;
+    }
+  }
+)

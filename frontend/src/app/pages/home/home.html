@@ -1,57 +1,93 @@
 <div class="p-6 md:p-10">
 
-  <!-- Page header -->
   <div class="flex items-center justify-between mb-8">
     <div>
       <h1 class="text-2xl font-bold text-zinc-900 dark:text-zinc-100">Your Courses</h1>
-      <p class="text-sm text-zinc-500 dark:text-zinc-400 mt-1">Courses you teach as a trainer</p>
+      <p class="text-sm text-zinc-500 dark:text-zinc-400 mt-1">Your courses across all organisations</p>
     </div>
-    <button
-      (click)="openAddCourse()"
-      class="flex items-center gap-2 px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white rounded-lg text-sm font-medium transition-colors cursor-pointer"
-    >
-      <mat-icon fontIcon="ph-plus"></mat-icon>
-      Add Course
-    </button>
   </div>
 
-  @if (organisationsOfUser().length > 0) {
-    @for(orga of organisationsOfUser(); track orga.id) {
-      <p>{{ orga.name }}</p>
-    }
-  }
+  @if (orgsWithCourses().length > 0) {
+    <div class="flex flex-col gap-4">
+      @for (item of orgsWithCourses(); track item.organisation.id) {
 
-  <!-- Course grid -->
-  @if (coursesAsTrainer().length > 0) {
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-      @for (course of coursesAsTrainer(); track course.id) {
-        <a
-          [routerLink]="['/courses', course.id]"
-          class="group flex flex-col gap-4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 hover:border-violet-300 dark:hover:border-violet-700 hover:shadow-md transition-all cursor-pointer"
-        >
-          <div class="flex items-start justify-between gap-2">
-            <h3 class="font-semibold text-zinc-900 dark:text-zinc-100 truncate group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
-              {{ course.name }}
-            </h3>
-            <mat-icon fontIcon="ph-arrow-right" class="shrink-0 text-zinc-300 dark:text-zinc-700 group-hover:text-violet-500 transition-colors"></mat-icon>
+        <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden">
+
+          <!-- Organisation header -->
+          <div class="flex items-center gap-3 px-5 py-4 border-b border-zinc-100 dark:border-zinc-800">
+            <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 shrink-0">
+              <mat-icon fontIcon="ph-buildings" class="text-zinc-500 dark:text-zinc-400 text-base!"></mat-icon>
+            </div>
+            <p class="font-semibold text-zinc-900 dark:text-zinc-100">{{ item.organisation.name }}</p>
           </div>
 
-          <div class="flex flex-wrap gap-1">
-            @for (trainer of course.trainers; track trainer.id) {
-              <span class="text-xs px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400">
-                {{ trainer.name }}
-              </span>
+          <div class="divide-y divide-zinc-100 dark:divide-zinc-800">
+
+            <!-- Trainer courses -->
+            @if (item.role !== 'member') {
+              <div class="px-5 py-4">
+                <p class="text-xs font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-3">As Trainer</p>
+                @if (item.trainerCourses.length > 0) {
+                  <div class="flex flex-col gap-2">
+                    @for (course of item.trainerCourses; track course.id) {
+                      <a
+                        [routerLink]="['/courses', course.id]"
+                        class="flex items-center gap-3 rounded-lg px-3 py-2.5 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-500"
+                      >
+                        <div class="flex items-center justify-center w-8 h-8 rounded-md bg-violet-50 dark:bg-violet-950 shrink-0">
+                          <mat-icon fontIcon="ph-chalkboard-teacher" class="text-violet-600 dark:text-violet-400 text-base!"></mat-icon>
+                        </div>
+                        <span class="flex-1 text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate">{{ course.name }}</span>
+                        <span class="text-xs text-zinc-400 dark:text-zinc-600 shrink-0">
+                          {{ course.appointments.length }} appointments · {{ course.registrations.length }} registered
+                        </span>
+                        <mat-icon fontIcon="ph-caret-right" class="text-zinc-300 dark:text-zinc-700 text-base! shrink-0"></mat-icon>
+                      </a>
+                    }
+                  </div>
+                } @else {
+                  <p class="text-sm text-zinc-400 dark:text-zinc-600">Not assigned to any courses yet.</p>
+                }
+              </div>
             }
+
+            <!-- Registered courses -->
+            @if (item.role === 'member' || item.memberCourses.length > 0) {
+              <div class="px-5 py-4">
+                <p class="text-xs font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-3">Registered</p>
+                @if (item.memberCourses.length > 0) {
+                  <div class="flex flex-col gap-2">
+                    @for (course of item.memberCourses; track course.id) {
+                      <a
+                        [routerLink]="['/courses', course.id]"
+                        class="flex items-center gap-3 rounded-lg px-3 py-2.5 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-500"
+                      >
+                        <div class="flex items-center justify-center w-8 h-8 rounded-md bg-sky-50 dark:bg-sky-950 shrink-0">
+                          <mat-icon fontIcon="ph-user" class="text-sky-600 dark:text-sky-400 text-base!"></mat-icon>
+                        </div>
+                        <span class="flex-1 text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate">{{ course.name }}</span>
+                        <span class="text-xs text-zinc-400 dark:text-zinc-600 shrink-0">
+                          {{ course.appointments.length }} appointments
+                        </span>
+                        <mat-icon fontIcon="ph-caret-right" class="text-zinc-300 dark:text-zinc-700 text-base! shrink-0"></mat-icon>
+                      </a>
+                    }
+                  </div>
+                } @else {
+                  <p class="text-sm text-zinc-400 dark:text-zinc-600">Not registered in any courses yet.</p>
+                }
+              </div>
+            }
+
           </div>
-        </a>
+        </div>
+
       }
     </div>
-
   } @else {
     <div class="flex flex-col items-center justify-center py-24 text-center">
       <mat-icon fontIcon="ph-book-open" class="text-5xl! text-zinc-300 dark:text-zinc-700 mb-4"></mat-icon>
-      <p class="font-medium text-zinc-500 dark:text-zinc-400">No courses yet</p>
-      <p class="text-sm text-zinc-400 dark:text-zinc-600 mt-1">Click <span class="font-medium">Add Course</span> to get started</p>
+      <p class="font-medium text-zinc-500 dark:text-zinc-400">Not part of an organisation yet</p>
     </div>
   }
 

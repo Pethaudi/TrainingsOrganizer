@@ -8,16 +8,10 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface CourseTrainerRepository extends JpaRepository<CourseTrainer, Integer> {
-    Iterable<CourseTrainer> findByCourseId(Integer id);
-
-    @Query("""
-            SELECT ct FROM coursetrainers ct
-            JOIN FETCH ct.trainer
-            JOIN FETCH ct.course
-            WHERE ct.course.id IN (
-                SELECT ct2.course.id FROM coursetrainers ct2 WHERE ct2.trainer.id = :trainerId
-            )
-            """)
-    List<CourseTrainer> findAllByCoursesOfTrainer(@Param("trainerId") Integer trainerId);
+    @Query(value = "SELECT ct.* FROM coursetrainers ct " +
+                   "JOIN coursesoforganisation coo ON ct.courseid = coo.courseid " +
+                   "WHERE ct.trainerid = :trainerId AND coo.organisationid = :organisationId",
+           nativeQuery = true)
+    List<CourseTrainer> findAllByTrainerIdAndOrganisationId(@Param("trainerId") Integer trainerId,
+                                                            @Param("organisationId") Integer organisationId);
 }
-

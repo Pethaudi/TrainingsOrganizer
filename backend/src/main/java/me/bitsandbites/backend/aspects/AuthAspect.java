@@ -1,11 +1,18 @@
 package me.bitsandbites.backend.aspects;
 
+import me.bitsandbites.backend.annotations.RequiredAuthOrganisationId;
 import me.bitsandbites.backend.annotations.RequiresAuth;
 import me.bitsandbites.backend.dtos.Role;
+import me.bitsandbites.backend.helpers.RoleValidator;
 import me.bitsandbites.backend.helpers.TokenParser;
+import me.bitsandbites.backend.repositories.MembersOfOrganisationRepository;
 import me.bitsandbites.backend.repositories.RegisteredRepository;
+import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
+import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.aop.support.AopUtils;
+import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -21,14 +28,16 @@ import java.util.Base64;
 public class AuthAspect {
 
     private final RegisteredRepository repo;
+    private final MembersOfOrganisationRepository membersRepo;
 
     @Autowired
-    public AuthAspect(RegisteredRepository repo) {
+    public AuthAspect(RegisteredRepository repo, MembersOfOrganisationRepository membersRepo) {
         this.repo = repo;
+        this.membersRepo = membersRepo;
     }
 
     @Before("@annotation(requiresAuth)")
-    public void checkAuth(RequiresAuth requiresAuth) {
+    public void checkAuth(JoinPoint joinPoint, RequiresAuth requiresAuth) {
         var requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         if (requestAttributes == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
@@ -43,12 +52,40 @@ public class AuthAspect {
         }
 
         Role[] requiredRoles = requiresAuth.role();
-        if (requiredRoles.length > 0) {
-            var userRole = Role.valueOf(tokenValue.getString("role").toLowerCase());
-            var hasRole = Arrays.stream(requiredRoles).anyMatch(r -> r == userRole);
-            if (!hasRole) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        if (requiredRoles.length == 0) {
+            return;
+        }
+
+        Integer organisationId = getOrganisationId(joinPoint);
+
+        var userId = tokenValue.getInt("id");
+        var membership = membersRepo.findByRegisteredIdAndOrganisationId(userId, organisationId);
+        if (membership.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+        var isRoleMatching = Arrays.stream(requiredRoles).anyMatch(r -> RoleValidator.isRoleHigherOrEqual(membership.get().getRole(), r));
+        if (!isRoleMatching) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+    }
+
+    private static @NonNull Integer getOrganisationId(JoinPoint joinPoint) {
+        var proxyMethod = ((MethodSignature) joinPoint.getSignature()).getMethod();
+        var targetMethod = AopUtils.getMostSpecificMethod(proxyMethod, joinPoint.getTarget().getClass());
+        var params = targetMethod.getParameters();
+        var args = joinPoint.getArgs();
+
+        Integer organisationId = null;
+        for (int i = 0; i < params.length; i++) {
+            if (params[i].isAnnotationPresent(RequiredAuthOrganisationId.class)) {
+                organisationId = (Integer) args[i];
+                break;
             }
         }
+
+        if (organisationId == null) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+        return organisationId;
     }
 }
